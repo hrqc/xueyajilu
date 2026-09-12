@@ -8,6 +8,8 @@ build/
 artifacts/
 screenshots/
 .ci-artifacts/
+ci-run-*-logs/
+ci-run-*-logs.zip
 
 # macOS metadata
 .DS_Store
