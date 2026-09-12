@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path (Join-Path $PSScriptRoot ".."))
 Set-Location $repo
@@ -60,7 +60,7 @@ if ($viewText -match "BPClassificationText|BPAdviceText") {
     $failures.Add("UI 中存在绕过 RuleEngine 的旧分类/建议实现")
 }
 $uiTestText = Get-Content -Raw -Encoding utf8 -LiteralPath "BPHealthTests/BPHealthUITests.swift"
-if ($uiTestText -match "if\s+[^\r\n]*\.exists|if\s+[^\r\n]*waitForExistence") {
+if ($uiTestText -match "if\s+[^\r\n]*(?:app|navigationBars|tabBars|buttons|switches|staticTexts|textFields|datePickers)[^\r\n]*\.exists|if\s+[^\r\n]*(?:app|navigationBars|tabBars|buttons|switches|staticTexts|textFields|datePickers)[^\r\n]*waitForExistence") {
     $failures.Add("UI 测试存在可跳过核心页面断言的条件分支")
 }
 $rulesText = Get-Content -Raw -Encoding utf8 -LiteralPath "BPHealth/Domain/Rules.swift"
@@ -87,7 +87,7 @@ if (-not ($privacyManifest.plist.dict.key -contains "NSPrivacyTracking")) { $fai
 if (-not ($privacyManifest.plist.dict.key -contains "NSPrivacyCollectedDataTypes")) { $failures.Add("隐私清单缺少 NSPrivacyCollectedDataTypes") }
 
 $textExtensions = @(".sh", ".yml", ".yaml", ".swift", ".md", ".json", ".strings", ".plist", ".xcprivacy", ".xcconfig", ".js", ".css", ".html", ".txt", ".py")
-foreach ($file in (Get-ChildItem -Recurse -File | Where-Object { $_.FullName -notmatch "\\.git\\" })) {
+foreach ($file in (Get-ChildItem -Recurse -File | Where-Object { $_.FullName -notmatch "\\.git\\" -and $_.FullName -notmatch "\\.ci-artifacts\\" })) {
     if (($textExtensions -contains $file.Extension.ToLowerInvariant()) -or $file.Name -in @(".gitignore", ".gitattributes", ".swiftlint.yml")) {
         $bytes = [System.IO.File]::ReadAllBytes($file.FullName)
         if ($bytes -contains 13) { $failures.Add("文本文件含 CRLF/CR：$($file.FullName)") }

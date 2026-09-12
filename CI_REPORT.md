@@ -1,16 +1,35 @@
 # BPHealth CI 报告
 
-当前 Windows 开发环境没有 macOS、Xcode 或 iOS Simulator，因此本文件在本地仅作为 CI 结果入口，未伪造通过状态。
+- 执行环境：macOS (15.7.9)
+- 模拟器 UDID：F0E646EF-4792-4F36-B48B-EC89B3A6B73B
+- Bundle Identifier：com.example.bphealth
+- Build：passed
+- XCTest/UI Test：passed
+- xcodebuild analyze：passed
+- SwiftLint：passed
+- 编译/分析警告数：0
+- XCTest 摘要：passed=54; total=54; failed=0; skipped=0; result=passed
+- UI 截图：captured
+- App 安装/启动：launched
+- 覆盖率：overall=80.00%; core-rules=93.71%
+- 最终质量门禁：PASS
 
-GitHub Actions 工作流位于 `.github/workflows/ios-ci.yml`，会在 `macos-15` 上执行：
+- 本轮原始工件：`/Users/runner/work/xueyajilu/xueyajilu/artifacts/run-20260912T031740Z-30157`
 
-- XcodeGen 工程生成与工程列表检查
-- `xcodebuild build`
-- XCTest 与 UI Test（启用代码覆盖率）
-- `xcodebuild analyze`
-- SwiftLint JSON 报告（作为辅助质量信号）
-- 编译/分析警告数与 XCTest 摘要
-- iPhone Simulator 启动与 UI 截图
-- 代码覆盖率门禁：规则文件 ≥90%，整体 ≥80%；Swift 警告按错误处理
+日志、`.xcresult` 和截图均来自本次 macOS runner；缺失工件会导致门禁失败。
 
-运行完成后，工作流会用真实的 Build、测试、分析、覆盖率和截图结果覆盖此报告，并上传 `artifacts/` 与 `screenshots/`。
+## 本次 GitHub Actions 执行状态
+
+- 运行：https://github.com/hrqc/xueyajilu/actions/runs/34669947177（attempt 1）
+- 提交：0aa46ab3089828c83b5b64ef60106bb4a8a3bb74
+- Runner：macOS / ARM64
+- Checkout：success
+- Apple 工具链：success
+- XcodeGen 安装：success
+- 工程生成：success
+- 工程检查：success
+- SwiftLint（含安装，strict）：success
+- Apple 验证脚本：success
+
+success/failure/skipped/cancelled 为步骤状态；测试数量、覆盖率和警告数以本轮 Apple 验证报告为准。
+任一步骤失败、跳过或缺失证据均不能声明完整验证通过。Face ID/Touch ID、HealthKit 和辅助技术仍需真机验证。

@@ -357,3 +357,17 @@ scripts/remote-verify.sh 与 project.yml 已统一为 LF，避免 macOS Bash 读
 - 修复：`BPHealthUITests` 使用非可选 `XCUIApplication`，移除会导致“对非可选值做条件绑定”的旧 `guard let app`。
 - 修复：`AppContainer`、`BPUIStore`、`BPHealthRootView` 避免在默认参数中直接实例化 `@MainActor` 类型；服务依赖在主 actor 初始化体内创建。
 - 验证：Windows 静态门禁、Python/Bash 语法和 Swift 禁用 API 扫描通过；实际 Swift/Xcode 编译仍必须由 macOS CI 证明。
+
+## 2026-09-12 macOS CI 最终门禁
+
+- 运行：[GitHub Actions 34669947177](https://github.com/hrqc/xueyajilu/actions/runs/34669947177)，提交 `0aa46ab3089828c83b5b64ef60106bb4a8a3bb74`。
+- 修改文件：`BPHealth/Views/BPHealthViews.swift`、`BPHealthTests/BPHealthRuleTests.swift`、`BPHealthTests/BPHealthUITests.swift`、`BPHealthTests/BPHealthViewCoverageTests.swift`、`project.yml`、`scripts/ci_report.py`、`scripts/remote-verify.sh`。
+- 执行命令：macOS runner 上的 XcodeGen、`xcodebuild build`、`xcodebuild test -enableCodeCoverage YES`、`xcodebuild analyze`、SwiftLint strict、`xcrun simctl` 安装/启动/截图及 `xccov` 门禁。
+- 结果：Build 通过；XCTest/UI Test `54/54` 通过；analyze 通过；SwiftLint 通过；编译/分析警告 `0`；App 安装、启动、截图均通过；整体覆盖率 `80.00%`；核心规则覆盖率 `93.71%`；最终质量门禁 PASS。
+- 本轮修复：补充 SwiftUI 页面 body、空状态、英文状态和 BPUIStore 本地生命周期覆盖，修复 Profile 慢性病开关的稳定 accessibility identifier；未降低生产安全存储策略。
+
+## 当前已知限制
+
+- Face ID/Touch ID、HealthKit 权限与真实血压写入、通知权限和 VoiceOver/动态字体仍需真实设备或辅助技术复核；本轮是 macOS iPhone Simulator 验证。
+- GitHub Actions 使用无签名模拟器构建；加密备份在无 Keychain entitlement 的测试进程中按平台错误路径安全跳过，生产实现仍使用 Keychain + AES-GCM。
+- SwiftData 迁移、iCloud 同步和 App Store Connect 隐私问卷需在正式签名工程中复核。
