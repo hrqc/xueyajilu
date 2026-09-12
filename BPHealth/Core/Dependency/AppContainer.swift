@@ -14,8 +14,9 @@ public final class AppContainer: ObservableObject {
                 authenticationService: (any AuthenticationServicing)? = nil,
                 healthKitService: (any HealthKitServicing)? = nil,
                 syncService: (any ReadingSyncService)? = nil) {
-        ruleEngine = BloodPressureRuleEngine(standard: standard)
-        dietaryEngine = DietaryAdviceRuleEngine(engine: ruleEngine)
+        let engine = BloodPressureRuleEngine(standard: standard)
+        ruleEngine = engine
+        dietaryEngine = DietaryAdviceRuleEngine(engine: engine)
         self.notificationService = notificationService ?? NotificationService()
         self.authenticationService = authenticationService ?? AuthenticationService()
         self.healthKitService = healthKitService ?? HealthKitService()
