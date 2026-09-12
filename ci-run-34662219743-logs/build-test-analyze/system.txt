@@ -1,0 +1,8 @@
+2026-09-12T00:36:53.3040000Z Requested labels: macos-15
+2026-09-12T00:36:53.3040000Z Job defined at: hrqc/xueyajilu/.github/workflows/ios-ci.yml@refs/heads/main
+2026-09-12T00:36:53.3040000Z Waiting for a runner to pick up this job...
+2026-09-12T00:36:53.3130000Z Job is waiting for a hosted runner to come online.
+2026-09-12T00:36:53.3020000Z Evaluating build-test-analyze.if
+2026-09-12T00:36:53.3020000Z Evaluating: success()
+2026-09-12T00:36:53.3020000Z Result: true
+2026-09-12T00:36:53.3130000Z Job is about to start running on the hosted runner: GitHub Actions 1000000019

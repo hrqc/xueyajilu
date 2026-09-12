@@ -1,0 +1,16 @@
+﻿2026-09-12T00:37:48.5845830Z ##[group]Run mkdir -p artifacts
+2026-09-12T00:37:48.5846820Z [36;1mmkdir -p artifacts[0m
+2026-09-12T00:37:48.5847590Z [36;1mrm -f artifacts/CI_REPORT.md[0m
+2026-09-12T00:37:48.5848290Z [36;1mbash scripts/remote-verify.sh[0m
+2026-09-12T00:37:48.5850380Z [36;1mtest -s artifacts/CI_REPORT.md[0m
+2026-09-12T00:37:48.5917790Z shell: /bin/bash -e {0}
+2026-09-12T00:37:48.5918100Z ##[endgroup]
+2026-09-12T00:37:51.3387010Z ==> Build
+2026-09-12T00:38:22.0040160Z PASS: Build
+2026-09-12T00:38:22.0134110Z ==> XCTest and UI tests
+2026-09-12T00:38:32.4286780Z FAIL: XCTest and UI tests (exit 65)
+2026-09-12T00:38:32.4288790Z ==> Static analysis
+2026-09-12T00:38:54.4075640Z PASS: Static analysis
+2026-09-12T00:38:54.4076310Z ==> Boot simulator
+2026-09-12T00:38:58.6574400Z PASS: Boot simulator
+2026-09-12T00:41:49.7430940Z ##[error]Process completed with exit code 1.

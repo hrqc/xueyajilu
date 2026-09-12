@@ -1,0 +1,43 @@
+﻿2026-09-12T00:41:49.8034440Z ##[group]Run mkdir -p artifacts
+2026-09-12T00:41:49.8035360Z [36;1mmkdir -p artifacts[0m
+2026-09-12T00:41:49.8038950Z [36;1mif [[ "$VERIFY_OUTCOME" != "success" && "$VERIFY_OUTCOME" != "failure" ]] || [[ ! -s artifacts/CI_REPORT.md ]]; then[0m
+2026-09-12T00:41:49.8041150Z [36;1m  {[0m
+2026-09-12T00:41:49.8042540Z [36;1m    echo "# BPHealth CI 报告"[0m
+2026-09-12T00:41:49.8044070Z [36;1m    echo[0m
+2026-09-12T00:41:49.8044790Z [36;1m    echo "- 结果：本轮未取得完整的 Apple 验证报告，不能认定通过。"[0m
+2026-09-12T00:41:49.8047620Z [36;1m    echo "- 构建状态：未知或未执行；请查看本轮步骤日志。"[0m
+2026-09-12T00:41:49.8048440Z [36;1m    echo "- XCTest / UI 测试通过率：未取得。"[0m
+2026-09-12T00:41:49.8049360Z [36;1m    echo "- 覆盖率：未取得。"[0m
+2026-09-12T00:41:49.8050010Z [36;1m    echo "- 分析警告数：未取得（不能记为 0）。"[0m
+2026-09-12T00:41:49.8051010Z [36;1m  } > artifacts/CI_REPORT.md[0m
+2026-09-12T00:41:49.8051920Z [36;1mfi[0m
+2026-09-12T00:41:49.8053090Z [36;1m{[0m
+2026-09-12T00:41:49.8053530Z [36;1m  echo[0m
+2026-09-12T00:41:49.8054070Z [36;1m  echo "## 本次 GitHub Actions 执行状态"[0m
+2026-09-12T00:41:49.8054740Z [36;1m  echo[0m
+2026-09-12T00:41:49.8055770Z [36;1m  printf -- '- 运行：%s/%s/actions/runs/%s（attempt %s）\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"[0m
+2026-09-12T00:41:49.8056360Z [36;1m  printf -- '- 提交：%s\n' "$GITHUB_SHA"[0m
+2026-09-12T00:41:49.8056950Z [36;1m  printf -- '- Runner：%s / %s\n' "$RUNNER_OS" "$RUNNER_ARCH"[0m
+2026-09-12T00:41:49.8057420Z [36;1m  printf -- '- Checkout：%s\n' "$CHECKOUT_OUTCOME"[0m
+2026-09-12T00:41:49.8057930Z [36;1m  printf -- '- Apple 工具链：%s\n' "$TOOLCHAIN_OUTCOME"[0m
+2026-09-12T00:41:49.8082640Z [36;1m  printf -- '- XcodeGen 安装：%s\n' "$XCODEGEN_OUTCOME"[0m
+2026-09-12T00:41:49.8083200Z [36;1m  printf -- '- 工程生成：%s\n' "$GENERATE_OUTCOME"[0m
+2026-09-12T00:41:49.8083690Z [36;1m  printf -- '- 工程检查：%s\n' "$PROJECT_OUTCOME"[0m
+2026-09-12T00:41:49.8085950Z [36;1m  printf -- '- SwiftLint（含安装，strict）：%s\n' "$LINT_OUTCOME"[0m
+2026-09-12T00:41:49.8086650Z [36;1m  printf -- '- Apple 验证脚本：%s\n' "$VERIFY_OUTCOME"[0m
+2026-09-12T00:41:49.8087060Z [36;1m  echo[0m
+2026-09-12T00:41:49.8087690Z [36;1m  echo "success/failure/skipped/cancelled 为步骤状态；测试数量、覆盖率和警告数以本轮 Apple 验证报告为准。"[0m
+2026-09-12T00:41:49.8088310Z [36;1m  echo "任一步骤失败、跳过或缺失证据均不能声明完整验证通过。Face ID/Touch ID、HealthKit 和辅助技术仍需真机验证。"[0m
+2026-09-12T00:41:49.8088860Z [36;1m} >> artifacts/CI_REPORT.md[0m
+2026-09-12T00:41:49.8089200Z [36;1mcp artifacts/CI_REPORT.md CI_REPORT.md[0m
+2026-09-12T00:41:49.8089700Z [36;1mcat artifacts/CI_REPORT.md >> "$GITHUB_STEP_SUMMARY"[0m
+2026-09-12T00:41:50.0294370Z shell: /bin/bash -e {0}
+2026-09-12T00:41:50.0295500Z env:
+2026-09-12T00:41:50.0296190Z   CHECKOUT_OUTCOME: success
+2026-09-12T00:41:50.0297090Z   TOOLCHAIN_OUTCOME: success
+2026-09-12T00:41:50.0297910Z   XCODEGEN_OUTCOME: success
+2026-09-12T00:41:50.0298790Z   GENERATE_OUTCOME: success
+2026-09-12T00:41:50.0299660Z   PROJECT_OUTCOME: success
+2026-09-12T00:41:50.0300240Z   LINT_OUTCOME: success
+2026-09-12T00:41:50.0301050Z   VERIFY_OUTCOME: failure
+2026-09-12T00:41:50.0301780Z ##[endgroup]

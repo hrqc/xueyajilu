@@ -1,0 +1,16 @@
+﻿2026-09-12T00:37:32.7888410Z ##[group]Run if ! brew list --formula xcodegen >/dev/null 2>&1; then
+2026-09-12T00:37:32.7889100Z [36;1mif ! brew list --formula xcodegen >/dev/null 2>&1; then[0m
+2026-09-12T00:37:32.7889560Z [36;1m  brew install xcodegen[0m
+2026-09-12T00:37:32.7889990Z [36;1mfi[0m
+2026-09-12T00:37:32.7890250Z [36;1mxcodegen --version[0m
+2026-09-12T00:37:33.0323530Z shell: /bin/bash -e {0}
+2026-09-12T00:37:33.0324610Z ##[endgroup]
+2026-09-12T00:37:39.8863590Z [32m==>[0m [1mDownloading bottle manifests[0m
+2026-09-12T00:37:39.8960840Z ✔︎ Bottle Manifest xcodegen (2.46.0)
+2026-09-12T00:37:39.8966060Z [34m==>[0m [1mWould install 1 formula:[0m
+2026-09-12T00:37:39.8966590Z xcodegen
+2026-09-12T00:37:39.9034380Z [32m==>[0m [1mFetching downloads for: [32mxcodegen[39m[0m
+2026-09-12T00:37:40.2501660Z ✔︎ Bottle xcodegen (2.46.0)
+2026-09-12T00:37:40.3082090Z [34m==>[0m [1mPouring xcodegen--2.46.0.arm64_sequoia.bottle.1.tar.gz[0m
+2026-09-12T00:37:40.4805540Z 🍺  /opt/homebrew/Cellar/xcodegen/2.46.0: 38 files, 7.5MB
+2026-09-12T00:37:40.5040580Z Version: 2.46.0

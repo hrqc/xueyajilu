@@ -41,7 +41,10 @@ final class BPHealthUITests: XCTestCase {
         let delete = app.buttons["删除"]
         XCTAssertTrue(delete.waitForExistence(timeout: 3))
         delete.tap()
-        let confirmDelete = app.buttons["删除"].lastMatch
+        // 上一步点掉的是左滑露出的「删除」。确认框里还有一个同名按钮，必须把范围收进
+        // sheets（confirmationDialog 在 iPhone 上就是 action sheet）才是要点的那个。
+        // 注意 XCUIElement 没有 lastMatch，别用「取最后一个匹配项」那种写法。
+        let confirmDelete = app.sheets.buttons["删除"]
         XCTAssertTrue(confirmDelete.waitForExistence(timeout: 3))
         confirmDelete.tap()
         XCTAssertFalse(app.otherElements["reading-row"].waitForExistence(timeout: 2))
