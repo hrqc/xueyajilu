@@ -33,6 +33,19 @@ final class BPHealthViewCoverageTests: XCTestCase {
             AnyView(PrivacyDisclaimerView())
         ]
 
+        // Access each opaque body explicitly. UIHostingController alone may
+        // defer SwiftUI result-builder evaluation until a run-loop layout pass.
+        _ = BPHealthRootView(store: store).body
+        _ = DashboardView(store: store, showingAdd: showingAdd).body
+        _ = AddEditReadingView(store: store, editing: reading).body
+        _ = HistoryView(store: store).body
+        _ = TrendsView(store: store).body
+        _ = AdviceView(store: store).body
+        _ = ProfileView(store: store).body
+        _ = SettingsView(store: store).body
+        _ = ExportView(store: store).body
+        _ = PrivacyDisclaimerView().body
+
         for page in pages {
             let host = UIHostingController(rootView: page)
             host.loadViewIfNeeded()
