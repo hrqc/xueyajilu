@@ -31,6 +31,31 @@ final class BPHealthUITests: XCTestCase {
         XCTAssertTrue(app.buttons["添加血压记录"].waitForExistence(timeout: 5))
     }
 
+    func testPrimaryTabsRenderTheirHealthManagementPages() {
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 10))
+
+        let records = app.tabBars.buttons["记录"]
+        XCTAssertTrue(records.waitForExistence(timeout: 5))
+        records.tap()
+        XCTAssertTrue(app.navigationBars["历史记录"].waitForExistence(timeout: 5))
+
+        let trends = app.tabBars.buttons["趋势"]
+        trends.tap()
+        XCTAssertTrue(app.navigationBars["趋势"].waitForExistence(timeout: 5))
+        let period = app.segmentedControls.firstMatch
+        XCTAssertTrue(period.waitForExistence(timeout: 5))
+        period.buttons["30天"].tap()
+
+        let advice = app.tabBars.buttons["建议"]
+        advice.tap()
+        XCTAssertTrue(app.navigationBars["饮食与健康建议"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "本应用不能替代医生诊断")).firstMatch.waitForExistence(timeout: 5))
+
+        let home = app.tabBars.buttons["首页"]
+        home.tap()
+        XCTAssertTrue(app.buttons["添加血压记录"].waitForExistence(timeout: 5))
+    }
+
     func testAddEditDeleteReadingFlow() {
         let add = app.buttons["添加血压记录"]
         guard add.waitForExistence(timeout: 5) else { return XCTFail("找不到添加记录入口") }
