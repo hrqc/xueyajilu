@@ -60,6 +60,7 @@ targets:
     platform: iOS
     sources:
       - path: BPHealthTests/BPHealthRuleTests.swift
+      - path: BPHealthTests/BPHealthViewCoverageTests.swift
     dependencies:
       - target: BPHealth
   BPHealthUITests:

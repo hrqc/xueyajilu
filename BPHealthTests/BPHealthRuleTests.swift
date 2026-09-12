@@ -8,6 +8,7 @@ import SwiftData
 
 final class BPHealthRuleTests: XCTestCase {
     let engine = BloodPressureRuleEngine()
+
     func testBoundaries() {
         XCTAssertEqual(engine.classify(systolic: 89, diastolic: 59).level, .low)
         XCTAssertEqual(engine.classify(systolic: 90, diastolic: 60).level, .normal)
@@ -290,6 +291,22 @@ final class BPHealthRuleTests: XCTestCase {
         XCTAssertEqual(BloodPressureRuleEngine(standard: .accAha).classify(systolic: 130, diastolic: 80).level, .stage1)
         XCTAssertEqual(BloodPressureRuleEngine(standard: .china).classify(systolic: 180, diastolic: 110).level, .stage3)
         XCTAssertEqual(BloodPressureRuleEngine(standard: .accAha).classify(systolic: 180, diastolic: 110).level, .stage2)
+    }
+
+    func testAllAdviceClassificationBranchesRemainCovered() {
+        let advice = DietaryAdviceRuleEngine()
+        XCTAssertTrue(advice.advice(for: BloodPressureReading(systolic: 89, diastolic: 59)).contains { $0.text.contains("补充水分") })
+        XCTAssertTrue(advice.advice(for: BloodPressureReading(systolic: 118, diastolic: 76)).contains { $0.text.contains("均衡") })
+
+        let acc = DietaryAdviceRuleEngine(engine: BloodPressureRuleEngine(standard: .accAha))
+        XCTAssertTrue(acc.advice(for: BloodPressureReading(systolic: 125, diastolic: 76)).contains { $0.text.contains("均衡") })
+        XCTAssertTrue(acc.advice(for: BloodPressureReading(systolic: 135, diastolic: 85)).contains { $0.text.contains("DASH") })
+        XCTAssertTrue(acc.advice(for: BloodPressureReading(systolic: 145, diastolic: 95)).contains { $0.text.contains("DASH") })
+
+        let child = UserProfile(ageOverride: 10, sex: "男", heightCm: 140)
+        let pediatric = BloodPressureRuleEngine()
+        XCTAssertEqual(pediatric.classify(systolic: 100, diastolic: 60, profile: child).level, .pediatricEvaluation)
+        XCTAssertEqual(pediatric.classify(systolic: 130, diastolic: 90, profile: child).level, .pediatricEvaluation)
     }
 
     func testPregnancyDiabetesAndFastingAdviceAreIncluded() {
