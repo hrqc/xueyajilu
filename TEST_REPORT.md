@@ -3,30 +3,24 @@
 ## 执行环境
 
 - 日期：2026-09-12
-- 环境：Windows 工作区；未安装 Xcode/Swift/iOS Simulator
-- 已运行：`git status --short`、源码文件扫描、规则与文档静态检查
+- 开发环境：Windows 工作区；未安装 Xcode/Swift/iOS Simulator，未伪造本地 iOS 验证
+- 真实验证：GitHub Actions macOS-15 runner，运行 34673382905，使用 XcodeGen、xcodebuild、XCTest/UI Test、xccov、xcrun simctl
+- Windows 本地补充：源码扫描、Windows 静态门禁、便携边界检查
 
-## 用例结果
+## 用例结果（最新 macOS CI 运行 34673382905）
 
 | 用例 | 结果 | 证据/限制 |
 |---|---|---|
-| 实施计划与目录 | 通过 | `IMPLEMENTATION_PLAN.md` 已生成 |
-| 成人分类边界 | 已编写 | `BPHealthTests/BPHealthRuleTests.swift`；需 macOS XCTest 执行 |
-| 输入校验与未来日期 | 已编写 | `ReadingValidator` 与 XCTest；需 macOS 执行 |
-| 儿童缺身高/百分位 | 已编写 | 缺身高提示儿科评估；内置 3–17 岁筛查参考与可配置第 90/95 百分位阈值测试；需 macOS 执行 |
-| 肾病饮食规则 | 已编写 | 不生成高钾建议；需 macOS 执行 |
-| AES-GCM 加密备份往返 | 已编写（CryptoKit/Security 条件测试） | 需 macOS/iOS XCTest 执行 |
-| 129/79、130/80 分类边界 | 已编写 | `BPHealthTests/BPHealthRuleTests.swift`；需 macOS XCTest 执行 |
-| 分类安全元数据 | 已编写 | 验证颜色名、解释、动作和危象紧急标记；需 macOS XCTest 执行 |
-| 用户资料 BMI/年龄及老人提示 | 已编写 | 验证 BMI、年龄覆盖值和个体化文案；需 macOS XCTest 执行 |
-| CSV 引号转义与时间排序 | 已编写 | 验证逗号/引号备注和升序导出；需 macOS XCTest 执行 |
-| 目标达标率、晨间/晚间统计 | 已编写 | `DashboardStats` 单元测试；需 macOS XCTest 执行 |
-| SwiftData 持久化/CRUD/搜索/空腹筛选 | 已编写内存容器 XCTest | Windows 无 SwiftData runtime，需 macOS XCTest 执行 |
-| CSV 导出/PDF 生成 | 已实现并已编写 XCTest | Windows 无 UIKit/PDF runtime，需 macOS XCTest 执行 |
-| UI 启动/新增/编辑/删除/时间选择/空腹/趋势/建议/导出/隐私入口 | 已实现测试用例；`-ui-testing` 使用内存 SwiftData 容器隔离测试 | Windows 无法运行 Simulator，仍待 macOS 执行 |
-| xcodebuild build/test/analyze | 未执行 | 当前系统无 Xcode |
-| 覆盖率 ≥90%/≥80% | 未测量 | 需 `xcodebuild test -enableCodeCoverage YES` |
-| 10000 条统计性能 | 已编写 XCTest `measure` 用例 | 真实耗时仍需 Instruments/Simulator |
+| 成人分类边界与混合极端读数 | 通过 | XCTest；核心规则覆盖率 93.71% |
+| 输入校验、未来时间、日期/时区 | 通过 | XCTest |
+| 儿童/青少年、老人、孕期、肾病、糖尿病 | 通过 | XCTest；儿科为本地筛查参考，仍需儿科医生评估 |
+| CSV/PDF 导出、排序、转义与英文模式 | 通过 | XCTest；导出页显示医疗免责声明 |
+| SwiftData CRUD、搜索、空腹筛选、全量清除 | 通过 | macOS XCTest/UI Test |
+| 10,000 条统计/趋势采样 | 通过 | XCTest measure 与最多 500 点采样；未替代 Instruments 真机帧率 |
+| UI 启动、新增、编辑、删除、日期、空腹、趋势、建议、设置、导出、隐私 | 通过 | UI Test 54/54；Simulator 截图已捕获 |
+| xcodebuild build/test/analyze、SwiftLint strict | 通过 | 编译/分析警告 0 |
+| 覆盖率 | 通过 | overall 80.08%；core-rules 93.71% |
+| Face ID/Touch ID、HealthKit 真机权限、通知授权、VoiceOver | 未在真机验证 | 需要签名设备/辅助技术环境 |
 
 ## 已知限制
 
@@ -360,10 +354,10 @@ scripts/remote-verify.sh 与 project.yml 已统一为 LF，避免 macOS Bash 读
 
 ## 2026-09-12 macOS CI 最终门禁
 
-- 运行：[GitHub Actions 34670578007](https://github.com/hrqc/xueyajilu/actions/runs/34670578007)，提交 `544d98f6debf742061690d2972ed8996504a42cf`。
-- 修改文件：`BPHealth/Views/BPHealthViews.swift`、`BPHealthTests/BPHealthRuleTests.swift`、`BPHealthTests/BPHealthUITests.swift`、`BPHealthTests/BPHealthViewCoverageTests.swift`、`project.yml`、`scripts/ci_report.py`、`scripts/remote-verify.sh`。
+- 运行：[GitHub Actions 34673382905](https://github.com/hrqc/xueyajilu/actions/runs/34673382905)，提交 `fbfc4a25806862f2a2d22c11e417cfe9ed5b79c3`。
+- 修改文件：BPHealth/Views/BPHealthViews.swift、BPHealth/Services/PlatformServices.swift、BPHealthTests/BPHealthRuleTests.swift、BPHealthTests/BPHealthUITests.swift、project.yml、scripts/ci_report.py、scripts/remote-verify.sh。
 - 执行命令：macOS runner 上的 XcodeGen、`xcodebuild build`、`xcodebuild test -enableCodeCoverage YES`、`xcodebuild analyze`、SwiftLint strict、`xcrun simctl` 安装/启动/截图及 `xccov` 门禁。
-- 结果：Build 通过；XCTest/UI Test `54/54` 通过；analyze 通过；SwiftLint 通过；编译/分析警告 `0`；App 安装、启动、截图均通过；整体覆盖率 `80.00%`；核心规则覆盖率 `93.71%`；最终质量门禁 PASS。
+- 结果：Build 通过；XCTest/UI Test `54/54` 通过；analyze 通过；SwiftLint 通过；编译/分析警告 `0`；App 安装、启动、截图均通过；整体覆盖率 `80.08%`；核心规则覆盖率 `93.71%`；最终质量门禁 PASS。
 - 本轮修复：补充 SwiftUI 页面 body、空状态、英文状态和 BPUIStore 本地生命周期覆盖，修复 Profile 慢性病开关的稳定 accessibility identifier；未降低生产安全存储策略。
 
 ## 当前已知限制
@@ -371,3 +365,10 @@ scripts/remote-verify.sh 与 project.yml 已统一为 LF，避免 macOS Bash 读
 - Face ID/Touch ID、HealthKit 权限与真实血压写入、通知权限和 VoiceOver/动态字体仍需真实设备或辅助技术复核；本轮是 macOS iPhone Simulator 验证。
 - GitHub Actions 使用无签名模拟器构建；加密备份在无 Keychain entitlement 的测试进程中按平台错误路径安全跳过，生产实现仍使用 Keychain + AES-GCM。
 - SwiftData 迁移、iCloud 同步和 App Store Connect 隐私问卷需在正式签名工程中复核。
+
+## 2026-09-12 最新 macOS CI 回归
+
+- 运行：[GitHub Actions 34673382905](https://github.com/hrqc/xueyajilu/actions/runs/34673382905)，提交 `fbfc4a25806862f2a2d22c11e417cfe9ed5b79c3`。
+- 结果：Build、XCTest/UI Test、xcodebuild analyze、SwiftLint、安装/启动/截图全部通过；54/54 测试通过，整体覆盖率 80.08%，核心规则覆盖率 93.71%，编译/分析警告 0。
+- 本轮修复并验证：空腹开关的可访问性标识与真实控件坐标交互断言；之前两次开关断言失败已由本轮 54/54 通过结果覆盖。
+- GitHub Actions 仍报告 Node.js 20 action deprecation 注记；这是 runner action 兼容性提示，不是 Swift 编译/分析警告。

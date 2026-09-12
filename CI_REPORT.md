@@ -11,17 +11,17 @@
 - XCTest 摘要：passed=54; total=54; failed=0; skipped=0; result=passed
 - UI 截图：captured
 - App 安装/启动：launched
-- 覆盖率：overall=80.00%; core-rules=93.71%
+- 覆盖率：overall=80.08%; core-rules=93.71%
 - 最终质量门禁：PASS
 
-- 本轮原始工件：`/Users/runner/work/xueyajilu/xueyajilu/artifacts/run-20260912T033236Z-4160`
+- 本轮原始工件：`/Users/runner/work/xueyajilu/xueyajilu/artifacts/run-20260912T043521Z-12322`
 
 日志、`.xcresult` 和截图均来自本次 macOS runner；缺失工件会导致门禁失败。
 
 ## 本次 GitHub Actions 执行状态
 
-- 运行：https://github.com/hrqc/xueyajilu/actions/runs/34670578007（attempt 1）
-- 提交：544d98f6debf742061690d2972ed8996504a42cf
+- 运行：https://github.com/hrqc/xueyajilu/actions/runs/34673382905（attempt 1）
+- 提交：fbfc4a25806862f2a2d22c11e417cfe9ed5b79c3
 - Runner：macOS / ARM64
 - Checkout：success
 - Apple 工具链：success
