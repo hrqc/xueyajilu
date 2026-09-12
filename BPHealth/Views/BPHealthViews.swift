@@ -263,7 +263,10 @@ private func uiReading(from model: BloodPressureReading) -> BPUIReading {
     @State private var showingAdd = false
     @AppStorage("bphealth.lockEnabled") private var lockEnabled = false
     @AppStorage("bphealth.language") private var languageRaw = AppLanguage.simplifiedChinese.rawValue
-    @State private var isUnlocked = true
+    // Start locked until the scene task confirms whether the user enabled the
+    // biometric/app lock. This prevents a brief data flash while authentication
+    // is still in flight when the app returns to the foreground.
+    @State private var isUnlocked = false
     @Environment(\.scenePhase) private var scenePhase
     public init(store: BPUIStore? = nil) { _store = StateObject(wrappedValue: store ?? BPUIStore()) }
     public var body: some View {
@@ -284,6 +287,8 @@ private func uiReading(from model: BloodPressureReading) -> BPUIReading {
             if lockEnabled {
                 isUnlocked = await store.dependencies.authenticationService.authenticate(reason: "验证身份后查看健康记录")
                 if !isUnlocked { lockEnabled = false; isUnlocked = true }
+            } else {
+                isUnlocked = true
             }
         }
         .onChange(of: lockEnabled) { _, enabled in
