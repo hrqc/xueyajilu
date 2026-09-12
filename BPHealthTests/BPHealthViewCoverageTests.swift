@@ -52,4 +52,21 @@ final class BPHealthViewCoverageTests: XCTestCase {
             XCTAssertNotNil(host.view)
         }
     }
+
+    func testEmptyAndAlternatePageStatesAreSafe() {
+        let store = BPUIStore()
+        store.reminderEnabled = true
+        store.profile.birthDate = Calendar.current.date(byAdding: .year, value: -45, to: .now)
+        store.persistenceMessage = "模拟持久化错误"
+        let showingAdd = Binding.constant(true)
+
+        _ = BPHealthRootView(store: store).body
+        _ = DashboardView(store: store, showingAdd: showingAdd).body
+        _ = HistoryView(store: store).body
+        _ = TrendsView(store: store).body
+        _ = AdviceView(store: store).body
+        _ = ProfileView(store: store).body
+        _ = SettingsView(store: store).body
+        XCTAssertTrue(store.readings.isEmpty)
+    }
 }
