@@ -56,8 +56,10 @@ EOF
 fi
 
 DESTINATION="platform=iOS Simulator,id=${DEVICE_UDID}"
-BUNDLE_ID="$(xcodebuild -showBuildSettings -project BPHealth.xcodeproj -scheme BPHealth 2>/dev/null | awk '/PRODUCT_BUNDLE_IDENTIFIER = / {print $3; exit}')"
-if [[ -z "${BUNDLE_ID}" ]]; then BUNDLE_ID="com.example.bphealth"; fi
+BUNDLE_ID="$(xcodebuild -showBuildSettings -project BPHealth.xcodeproj -scheme BPHealth 2>/dev/null | awk -F'= ' '/^[[:space:]]*PRODUCT_BUNDLE_IDENTIFIER = / {print $2; exit}' | tr -d '[:space:]')"
+# xcodebuild may emit an unresolved/non-reverse-DNS value when the setting is
+# inherited from a generated test target. Never pass that value to simctl.
+if [[ ! "${BUNDLE_ID}" =~ ^[A-Za-z0-9][A-Za-z0-9.-]*\.[A-Za-z0-9.-]+$ ]]; then BUNDLE_ID="com.example.bphealth"; fi
 
 run_step "Build" "${RUN_DIR}/build.log" xcodebuild build -project BPHealth.xcodeproj -scheme BPHealth -destination "${DESTINATION}" -derivedDataPath "${RUN_DIR}/DerivedData" -resultBundlePath "${RUN_DIR}/build.xcresult" CODE_SIGNING_ALLOWED=NO SWIFT_TREAT_WARNINGS_AS_ERRORS=YES GCC_TREAT_WARNINGS_AS_ERRORS=YES
 BUILD_EXIT=$?

@@ -36,6 +36,10 @@ targets:
         INFOPLIST_KEY_NSHealthShareUsageDescription: "用于读取您授权的血压与脉搏健康数据"
         INFOPLIST_KEY_NSHealthUpdateUsageDescription: "用于将血压与可选脉搏记录保存到健康"
         INFOPLIST_KEY_NSHumanReadableCopyright: "BPHealth"
+        # The SwiftUI app has no launch storyboard and is intentionally
+        # portrait-first; requiring full screen removes Xcode's validation
+        # warnings about missing launch configuration/orientations.
+        INFOPLIST_KEY_UIRequiresFullScreen: "YES"
         CODE_SIGN_STYLE: Automatic
     entitlements:
       path: BPHealth/BPHealth.entitlements
