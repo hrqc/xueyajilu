@@ -101,7 +101,14 @@ final class BPHealthUITests: XCTestCase {
         XCTAssertTrue(reveal(fasting))
         let before = fasting.value as? String
         fasting.tap()
-        let after = app.switches["空腹测量"].value as? String
+        let updatedFasting = app.switches["空腹测量"]
+        let valueChanged = NSPredicate { _, _ in
+            guard let current = updatedFasting.value as? String else { return false }
+            return current != before
+        }
+        let expectation = XCTNSPredicateExpectation(predicate: valueChanged, object: updatedFasting)
+        XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: 2), .completed)
+        let after = updatedFasting.value as? String
         XCTAssertNotEqual(before, after)
         app.buttons["取消"].tap()
     }
