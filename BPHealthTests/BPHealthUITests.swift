@@ -6,10 +6,10 @@ final class BPHealthUITests: XCTestCase {
     @discardableResult
     private func reveal(_ element: XCUIElement, swipes: Int = 6) -> Bool {
         for _ in 0...swipes {
-            if element.waitForExistence(timeout: 1) { return true }
+            if element.waitForExistence(timeout: 1) && element.isHittable { return true }
             app.swipeUp()
         }
-        return element.exists
+        return element.exists && element.isHittable
     }
 
     override func setUpWithError() throws {
@@ -104,10 +104,11 @@ final class BPHealthUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["设置"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["血压指南"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.switches["开启每日提醒"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["删除全部本地数据"].waitForExistence(timeout: 5))
+        XCTAssertTrue(reveal(app.buttons["删除全部本地数据"]))
         app.navigationBars.buttons.element(boundBy: 0).tap()
-        XCTAssertTrue(app.staticTexts["隐私与免责声明"].waitForExistence(timeout: 5))
-        app.staticTexts["隐私与免责声明"].tap()
+        let privacy = app.staticTexts["隐私与免责声明"]
+        XCTAssertTrue(reveal(privacy))
+        privacy.tap()
         XCTAssertTrue(app.staticTexts["本应用不能替代医生诊断，如有不适请及时就医。"].waitForExistence(timeout: 5))
     }
 
