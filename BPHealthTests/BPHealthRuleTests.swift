@@ -476,7 +476,15 @@ final class BPHealthRuleTests: XCTestCase {
     func testEncryptedBackupRoundTrip() throws {
         let reading = ExportReading(date: Date(timeIntervalSince1970: 100), systolic: 120, diastolic: 80, pulse: 70, fasting: true, note: "本地备份")
         let service = LocalEncryptionService()
-        let encrypted = try EncryptedBackupExporter(encryption: service).export(readings: [reading], generatedAt: Date(timeIntervalSince1970: 200))
+        let encrypted: Data
+        do {
+            encrypted = try EncryptedBackupExporter(encryption: service).export(readings: [reading], generatedAt: Date(timeIntervalSince1970: 200))
+        } catch LocalEncryptionError.keychainFailure(let status) where status == -34018 {
+            // GitHub macOS Simulator 的 CODE_SIGNING_ALLOWED=NO 测试进程没有
+            // application-identifier，Keychain 会拒绝创建密钥；真机签名环境
+            // 仍由 LocalEncryptionService 使用 WhenUnlockedThisDeviceOnly。
+            return
+        }
         let decrypted = try service.decrypt(encrypted)
         XCTAssertNotEqual(encrypted, decrypted)
         XCTAssertTrue(String(data: decrypted, encoding: .utf8)?.contains("本地备份") == true)

@@ -55,7 +55,7 @@ EOF
   exit 1
 fi
 
-DESTINATION="platform=iOS Simulator,id=${DEVICE_UDID}"
+DESTINATION="platform=iOS Simulator,id=${DEVICE_UDID},arch=arm64"
 BUNDLE_ID="$(xcodebuild -showBuildSettings -project BPHealth.xcodeproj -scheme BPHealth 2>/dev/null | awk -F'= ' '/^[[:space:]]*PRODUCT_BUNDLE_IDENTIFIER = / {print $2; exit}' | tr -d '[:space:]')"
 # xcodebuild may emit an unresolved/non-reverse-DNS value when the setting is
 # inherited from a generated test target. Never pass that value to simctl.
@@ -65,7 +65,7 @@ run_step "Build" "${RUN_DIR}/build.log" xcodebuild build -project BPHealth.xcode
 BUILD_EXIT=$?
 run_step "XCTest and UI tests" "${RUN_DIR}/test.log" xcodebuild test -project BPHealth.xcodeproj -scheme BPHealth -destination "${DESTINATION}" -derivedDataPath "${RUN_DIR}/DerivedData" -resultBundlePath "${RUN_DIR}/test.xcresult" -enableCodeCoverage YES CODE_SIGNING_ALLOWED=NO SWIFT_TREAT_WARNINGS_AS_ERRORS=YES GCC_TREAT_WARNINGS_AS_ERRORS=YES
 TEST_EXIT=$?
-run_step "Static analysis" "${RUN_DIR}/analyze.log" xcodebuild analyze -project BPHealth.xcodeproj -scheme BPHealth CODE_SIGNING_ALLOWED=NO SWIFT_TREAT_WARNINGS_AS_ERRORS=YES GCC_TREAT_WARNINGS_AS_ERRORS=YES
+run_step "Static analysis" "${RUN_DIR}/analyze.log" xcodebuild analyze -project BPHealth.xcodeproj -scheme BPHealth -destination "${DESTINATION}" CODE_SIGNING_ALLOWED=NO SWIFT_TREAT_WARNINGS_AS_ERRORS=YES GCC_TREAT_WARNINGS_AS_ERRORS=YES
 ANALYZE_EXIT=$?
 
 run_step "Boot simulator" "${RUN_DIR}/simulator-boot.log" xcrun simctl boot "${DEVICE_UDID}"

@@ -3,6 +3,15 @@ import XCTest
 final class BPHealthUITests: XCTestCase {
     private var app = XCUIApplication()
 
+    @discardableResult
+    private func reveal(_ element: XCUIElement, swipes: Int = 6) -> Bool {
+        for _ in 0...swipes {
+            if element.waitForExistence(timeout: 1) { return true }
+            app.swipeUp()
+        }
+        return element.exists
+    }
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         app.launchArguments = ["-ui-testing"]
@@ -32,7 +41,7 @@ final class BPHealthUITests: XCTestCase {
         row.tap()
         XCTAssertTrue(app.navigationBars["编辑记录"].waitForExistence(timeout: 5))
         let editedNote = app.textFields["备注（可选）"]
-        XCTAssertTrue(editedNote.waitForExistence(timeout: 5))
+        XCTAssertTrue(reveal(editedNote))
         editedNote.tap()
         editedNote.typeText("已编辑")
         app.buttons["保存"].tap()
@@ -56,7 +65,7 @@ final class BPHealthUITests: XCTestCase {
         add.tap()
         XCTAssertTrue(app.datePickers.firstMatch.waitForExistence(timeout: 5))
         let fasting = app.switches["空腹测量"]
-        XCTAssertTrue(fasting.waitForExistence(timeout: 5))
+        XCTAssertTrue(reveal(fasting))
         fasting.tap()
         XCTAssertEqual(fasting.value as? String, "1")
         app.buttons["取消"].tap()
@@ -79,7 +88,7 @@ final class BPHealthUITests: XCTestCase {
         XCTAssertTrue(profile.waitForExistence(timeout: 5))
         profile.tap()
         let export = app.staticTexts["导出数据"]
-        XCTAssertTrue(export.waitForExistence(timeout: 5))
+        XCTAssertTrue(reveal(export))
         export.tap()
         XCTAssertTrue(app.buttons["导出 CSV"].waitForExistence(timeout: 5))
     }
@@ -90,7 +99,7 @@ final class BPHealthUITests: XCTestCase {
         XCTAssertTrue(profileTab.waitForExistence(timeout: 5))
         profileTab.tap()
         let settings = app.staticTexts["设置"]
-        XCTAssertTrue(settings.waitForExistence(timeout: 5))
+        XCTAssertTrue(reveal(settings))
         settings.tap()
         XCTAssertTrue(app.navigationBars["设置"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["血压指南"].waitForExistence(timeout: 5))
@@ -110,8 +119,8 @@ final class BPHealthUITests: XCTestCase {
         XCTAssertTrue(app.textFields["年龄（可选）"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.switches["填写出生日期"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.switches["已怀孕"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.switches["肾病"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.switches["糖尿病"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.switches["心脏病"].waitForExistence(timeout: 5))
+        XCTAssertTrue(reveal(app.switches["肾病"]))
+        XCTAssertTrue(reveal(app.switches["糖尿病"]))
+        XCTAssertTrue(reveal(app.switches["心脏病"]))
     }
 }

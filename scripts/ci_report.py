@@ -94,9 +94,20 @@ def test_result(result_bundle: Path) -> tuple[str, bool]:
 
 def warning_count(run_dir: Path) -> int:
     count = 0
+    informational = (
+        "using the first of multiple matching destinations",
+        "metadata extraction skipped",
+        "ignoring --strip-bitcode",
+    )
     for path in (run_dir / "build.log", run_dir / "test.log", run_dir / "analyze.log"):
         if path.exists():
-            count += len(re.findall(r"\bwarning:", path.read_text(encoding="utf-8", errors="replace"), re.IGNORECASE))
+            lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+            count += sum(
+                1
+                for line in lines
+                if re.search(r"\bwarning:", line, re.IGNORECASE)
+                and not any(marker in line.lower() for marker in informational)
+            )
     return count
 
 
