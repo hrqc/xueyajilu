@@ -127,7 +127,7 @@ final class BPHealthRuleTests: XCTestCase {
     }
 
     func testCSVExporterSupportsEnglishHeadersAndBooleanValues() {
-        let reading = BloodPressureReading(systolic: 120, diastolic: 80, fasting: true, arm: .left, position: .sitting, mood: .calm, exerciseBefore: true, medicationTaken: true)
+        let reading = BloodPressureReading(systolic: 120, diastolic: 80, arm: .left, position: .sitting, mood: .calm, exerciseBefore: true, medicationTaken: true, fasting: true)
         let csv = CSVExporter().export([reading], language: .english)
         XCTAssertTrue(csv.hasPrefix("Measured at,Systolic,Diastolic,Pulse,Fasting"))
         XCTAssertTrue(csv.contains("\"Yes\""))
@@ -345,8 +345,15 @@ final class BPHealthRuleTests: XCTestCase {
     }
 
     func testTenThousandReadingListProjectionAndTrendSamplingPerformance() {
-        let readings = (0..<10_000).map { index in
-            BloodPressureReading(measuredAt: Date(timeIntervalSince1970: TimeInterval(index)), systolic: 110 + index % 50, diastolic: 70 + index % 20, pulse: index % 3 == 0 ? 60 : nil)
+        // 拆成独立子表达式并标出闭包返回类型：原来一行内混合取模运算与 Int? 三元
+        // 表达式，编译器推不出类型，报 "unable to type-check this expression in
+        // reasonable time"。语义与拆分前完全一致。
+        let readings = (0..<10_000).map { (index: Int) -> BloodPressureReading in
+            let measuredAt = Date(timeIntervalSince1970: TimeInterval(index))
+            let systolic = 110 + index % 50
+            let diastolic = 70 + index % 20
+            let pulse: Int? = index % 3 == 0 ? 60 : nil
+            return BloodPressureReading(measuredAt: measuredAt, systolic: systolic, diastolic: diastolic, pulse: pulse)
         }
         measure {
             let filtered = readings.filter { $0.systolic >= 120 }.sorted { $0.measuredAt > $1.measuredAt }
@@ -396,8 +403,8 @@ final class BPHealthRuleTests: XCTestCase {
         let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: BloodPressureReading.self, UserProfile.self, configurations: configuration)
         let repository = ReadingRepository(context: container.mainContext)
-        let fasting = BloodPressureReading(systolic: 120, diastolic: 80, fasting: true, note: "晨间")
-        let nonFasting = BloodPressureReading(systolic: 130, diastolic: 85, fasting: false, note: "晚间")
+        let fasting = BloodPressureReading(systolic: 120, diastolic: 80, note: "晨间", fasting: true)
+        let nonFasting = BloodPressureReading(systolic: 130, diastolic: 85, note: "晚间", fasting: false)
         try repository.save(fasting)
         try repository.save(nonFasting)
         XCTAssertEqual(try repository.fetch(fasting: true).count, 1)
