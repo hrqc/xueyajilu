@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#102a27" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>脉象 · 血压健康管理</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-lockup"><span class="brand-mark">⌁</span><span>脉象</span></div>
+        <button class="icon-button" id="profileButton" aria-label="打开个人资料"><span id="profileInitial">我</span></button>
+      </header>
+
+      <main>
+        <section class="view active" id="dashboardView" aria-labelledby="dashboardTitle">
+          <div class="greeting-row">
+            <div><p class="eyebrow">健康仪表 · <span id="todayLabel"></span></p><h1 id="dashboardTitle">今天，先听听身体。</h1></div>
+            <div class="streak"><span class="streak-dot"></span><span id="streakText">连续 0 天</span></div>
+          </div>
+
+          <section class="hero-card" id="heroCard">
+            <div class="hero-top"><div><p class="eyebrow light">最近一次记录</p><p class="hero-time" id="latestTime">还没有记录</p></div><div class="pulse-orbit"><div class="pulse-core">♥</div></div></div>
+            <div class="reading"><div><span class="reading-value" id="latestSystolic">—</span><span class="reading-unit">mmHg</span><p class="reading-label">收缩压 · 高压</p></div><div class="reading-divider"></div><div><span class="reading-value" id="latestDiastolic">—</span><span class="reading-unit">mmHg</span><p class="reading-label">舒张压 · 低压</p></div></div>
+            <div class="status-line"><span class="status-pill" id="statusPill">等待记录</span><span id="statusCaption">记录一笔，看看今天的状态</span></div>
+          </section>
+
+          <button class="primary-action" id="openRecordButton"><span class="plus">＋</span> 记录一次血压</button>
+
+          <div class="section-heading"><div><p class="eyebrow">你的节奏</p><h2>最近 7 天</h2></div><button class="text-button" id="viewAllButton">查看全部 <span>→</span></button></div>
+          <section class="week-card" id="weekChart" aria-label="最近7天血压趋势"></section>
+
+          <div class="section-heading advice-heading"><div><p class="eyebrow">给今天的你</p><h2>饮食提示</h2></div><span class="sparkle">✦</span></div>
+          <section class="advice-card" id="adviceCard"><div class="advice-icon">◌</div><div><h3 id="adviceTitle">建立你的第一笔记录</h3><p id="adviceText">记录血压后，这里会根据状态给你一条简单、可执行的饮食建议。</p></div></section>
+        </section>
+
+        <section class="view" id="recordsView" aria-labelledby="recordsTitle">
+          <div class="page-heading"><p class="eyebrow">测量档案</p><h1 id="recordsTitle">每一次，都算数。</h1><p class="subcopy">保存你的节奏，给身体一份可回看的答案。</p></div>
+          <div class="filter-row"><button class="filter-chip active" data-filter="all">全部</button><button class="filter-chip" data-filter="高血压">偏高</button><button class="filter-chip" data-filter="正常">正常</button><button class="filter-chip" data-filter="低血压">偏低</button></div>
+          <div class="records-list" id="recordsList"></div>
+        </section>
+
+        <section class="view" id="profileView" aria-labelledby="profileTitle">
+          <div class="page-heading"><p class="eyebrow">个人基线</p><h1 id="profileTitle">认识你，才懂你的数。</h1><p class="subcopy">年龄和性别会帮助我们给出更贴近你的提示。</p></div>
+          <form class="profile-form" id="profileForm"><label>怎么称呼你？<input id="nameInput" type="text" placeholder="例如：小林" maxlength="20" /></label><label>你的年龄<input id="ageInput" type="number" min="1" max="120" placeholder="例如：32" required /></label><fieldset><legend>生理性别</legend><div class="segmented"><label><input type="radio" name="sex" value="女" checked /><span>女</span></label><label><input type="radio" name="sex" value="男" /><span>男</span></label><label><input type="radio" name="sex" value="其他" /><span>其他</span></label></div></fieldset><button class="primary-action" type="submit">保存个人资料</button></form>
+          <div class="privacy-note">⌁ 数据只保存在这台设备上，不会上传。</div>
+        </section>
+      </main>
+
+      <nav class="tabbar" aria-label="主导航"><button class="tab active" data-view="dashboardView"><span>◉</span><small>今天</small></button><button class="tab" data-view="recordsView"><span>▤</span><small>记录</small></button><button class="tab" data-view="profileView"><span>◎</span><small>我的</small></button></nav>
+
+      <div class="modal-backdrop" id="recordModal" aria-hidden="true"><section class="record-sheet" role="dialog" aria-modal="true" aria-labelledby="recordTitle"><div class="sheet-handle"></div><div class="sheet-heading"><div><p class="eyebrow">新测量</p><h2 id="recordTitle">把此刻记下来</h2></div><button class="close-button" id="closeModal" aria-label="关闭">×</button></div><form id="recordForm"><div class="input-grid"><label>高压 <div class="number-field"><input id="systolicInput" type="number" min="60" max="260" inputmode="numeric" placeholder="120" required /><span>mmHg</span></div></label><label>低压 <div class="number-field"><input id="diastolicInput" type="number" min="30" max="180" inputmode="numeric" placeholder="80" required /><span>mmHg</span></div></label></div><label>测量时间<div class="time-row"><button class="time-toggle active" type="button" data-time-mode="now">现在 · <span id="nowTimeLabel"></span></button><button class="time-toggle" type="button" data-time-mode="manual">手动选择</button></div><input class="manual-time" id="manualTimeInput" type="datetime-local" aria-label="手动选择测量时间" /></label><fieldset><legend>测量前是否空腹？</legend><div class="segmented two"><label><input type="radio" name="fasting" value="是" checked /><span>空腹</span></label><label><input type="radio" name="fasting" value="否" /><span>餐后 / 非空腹</span></label></div></fieldset><label>备注 <span class="optional">可选</span><textarea id="noteInput" rows="2" maxlength="120" placeholder="例如：晨起，睡眠 7 小时"></textarea></label><p class="form-error" id="formError" role="alert"></p><button class="primary-action" type="submit">保存这次记录</button></form></section></div>
+      <div class="toast" id="toast" role="status"></div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

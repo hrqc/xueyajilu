@@ -1,0 +1,30 @@
+# Xcode / XcodeGen generated output
+BPHealth.xcodeproj/
+DerivedData/
+build/
+*.xcresult/
+
+# CI artifacts
+artifacts/
+screenshots/
+
+# macOS metadata
+.DS_Store
+
+# Secrets / local config
+.env
+.env.local
+
+# Logs
+*.log
+
+# Node (web prototype)
+node_modules/
+
+# Xcode user state
+*.xcuserstate
+xcuserdata/
+
+# Python
+__pycache__/
+*.pyc

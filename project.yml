@@ -1,0 +1,58 @@
+name: BPHealth
+options:
+  deploymentTarget:
+    iOS: "17.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: "YES"
+    GCC_TREAT_WARNINGS_AS_ERRORS: "YES"
+configFiles:
+  Debug: Config/Shared.xcconfig
+  Release: Config/Shared.xcconfig
+targets:
+  BPHealth:
+    type: application
+    platform: iOS
+    sources:
+      - path: BPHealth
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BPHEALTH_BUNDLE_ID)
+        INFOPLIST_KEY_CFBundleDisplayName: BPHealth
+        SWIFT_VERSION: "5.9"
+        SWIFT_TREAT_WARNINGS_AS_ERRORS: "YES"
+        GCC_TREAT_WARNINGS_AS_ERRORS: "YES"
+        INFOPLIST_KEY_NSFaceIDUsageDescription: "用于保护本地健康记录"
+        INFOPLIST_KEY_NSHealthShareUsageDescription: "用于读取您授权的血压与脉搏健康数据"
+        INFOPLIST_KEY_NSHealthUpdateUsageDescription: "用于将血压与可选脉搏记录保存到健康"
+        INFOPLIST_KEY_NSHumanReadableCopyright: "BPHealth"
+        CODE_SIGN_STYLE: Automatic
+    entitlements:
+      path: BPHealth/BPHealth.entitlements
+    resources:
+      - path: BPHealth/Resources
+      - path: BPHealth/PrivacyInfo.xcprivacy
+    dependencies:
+      - sdk: HealthKit.framework
+    scheme:
+      testTargets:
+        - BPHealthTests
+        - BPHealthUITests
+      gatherCoverageData: true
+      coverageTargets:
+        - BPHealth
+  BPHealthTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: BPHealthTests/BPHealthRuleTests.swift
+    dependencies:
+      - target: BPHealth
+  BPHealthUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: BPHealthTests/BPHealthUITests.swift
+    dependencies:
+      - target: BPHealth

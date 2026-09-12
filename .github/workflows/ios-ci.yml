@@ -1,0 +1,133 @@
+name: BPHealth iOS CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-analyze:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+      - name: Show Apple toolchain
+        id: toolchain
+        run: |
+          xcodebuild -version
+          xcrun simctl list runtimes
+      - name: Install XcodeGen
+        id: xcodegen
+        run: |
+          if ! brew list --formula xcodegen >/dev/null 2>&1; then
+            brew install xcodegen
+          fi
+          xcodegen --version
+      - name: Generate Xcode project
+        id: generate
+        run: xcodegen generate
+      - name: Verify generated project
+        id: project
+        run: xcodebuild -list -project BPHealth.xcodeproj
+      - name: SwiftLint quality check
+        id: lint
+        # Collect Apple build/test evidence even when lint fails. The final gate
+        # checks the original outcome and fails the job for any lint failure.
+        continue-on-error: true
+        run: |
+          mkdir -p artifacts
+          if ! brew list --formula swiftlint >/dev/null 2>&1; then
+            brew install swiftlint
+          fi
+          swiftlint version
+          set +e
+          swiftlint lint --strict --config .swiftlint.yml --reporter json > artifacts/swiftlint.json
+          status=$?
+          printf '%s\n' "$status" > artifacts/swiftlint.exit
+          exit "$status"
+      - name: Build, test, analyze and capture UI screenshot
+        id: verify
+        run: |
+          mkdir -p artifacts
+          rm -f artifacts/CI_REPORT.md
+          bash scripts/remote-verify.sh
+          test -s artifacts/CI_REPORT.md
+      - name: Publish this run's CI report
+        id: report
+        if: always()
+        env:
+          CHECKOUT_OUTCOME: ${{ steps.checkout.outcome }}
+          TOOLCHAIN_OUTCOME: ${{ steps.toolchain.outcome }}
+          XCODEGEN_OUTCOME: ${{ steps.xcodegen.outcome }}
+          GENERATE_OUTCOME: ${{ steps.generate.outcome }}
+          PROJECT_OUTCOME: ${{ steps.project.outcome }}
+          LINT_OUTCOME: ${{ steps.lint.outcome }}
+          VERIFY_OUTCOME: ${{ steps.verify.outcome }}
+        run: |
+          mkdir -p artifacts
+          if [[ "$VERIFY_OUTCOME" != "success" && "$VERIFY_OUTCOME" != "failure" ]] || [[ ! -s artifacts/CI_REPORT.md ]]; then
+            {
+              echo "# BPHealth CI 报告"
+              echo
+              echo "- 结果：本轮未取得完整的 Apple 验证报告，不能认定通过。"
+              echo "- 构建状态：未知或未执行；请查看本轮步骤日志。"
+              echo "- XCTest / UI 测试通过率：未取得。"
+              echo "- 覆盖率：未取得。"
+              echo "- 分析警告数：未取得（不能记为 0）。"
+            } > artifacts/CI_REPORT.md
+          fi
+          {
+            echo
+            echo "## 本次 GitHub Actions 执行状态"
+            echo
+            printf -- '- 运行：%s/%s/actions/runs/%s（attempt %s）\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"
+            printf -- '- 提交：%s\n' "$GITHUB_SHA"
+            printf -- '- Runner：%s / %s\n' "$RUNNER_OS" "$RUNNER_ARCH"
+            printf -- '- Checkout：%s\n' "$CHECKOUT_OUTCOME"
+            printf -- '- Apple 工具链：%s\n' "$TOOLCHAIN_OUTCOME"
+            printf -- '- XcodeGen 安装：%s\n' "$XCODEGEN_OUTCOME"
+            printf -- '- 工程生成：%s\n' "$GENERATE_OUTCOME"
+            printf -- '- 工程检查：%s\n' "$PROJECT_OUTCOME"
+            printf -- '- SwiftLint（含安装，strict）：%s\n' "$LINT_OUTCOME"
+            printf -- '- Apple 验证脚本：%s\n' "$VERIFY_OUTCOME"
+            echo
+            echo "success/failure/skipped/cancelled 为步骤状态；测试数量、覆盖率和警告数以本轮 Apple 验证报告为准。"
+            echo "任一步骤失败、跳过或缺失证据均不能声明完整验证通过。Face ID/Touch ID、HealthKit 和辅助技术仍需真机验证。"
+          } >> artifacts/CI_REPORT.md
+          cp artifacts/CI_REPORT.md CI_REPORT.md
+          cat artifacts/CI_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload test artifacts
+        id: upload
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bphealth-ci-results
+          path: |
+            CI_REPORT.md
+            artifacts/
+            screenshots/
+          if-no-files-found: error
+      - name: Enforce complete verification
+        if: always()
+        env:
+          CHECKOUT_OUTCOME: ${{ steps.checkout.outcome }}
+          TOOLCHAIN_OUTCOME: ${{ steps.toolchain.outcome }}
+          XCODEGEN_OUTCOME: ${{ steps.xcodegen.outcome }}
+          GENERATE_OUTCOME: ${{ steps.generate.outcome }}
+          PROJECT_OUTCOME: ${{ steps.project.outcome }}
+          LINT_OUTCOME: ${{ steps.lint.outcome }}
+          VERIFY_OUTCOME: ${{ steps.verify.outcome }}
+          REPORT_OUTCOME: ${{ steps.report.outcome }}
+          UPLOAD_OUTCOME: ${{ steps.upload.outcome }}
+        run: |
+          for outcome in "$CHECKOUT_OUTCOME" "$TOOLCHAIN_OUTCOME" "$XCODEGEN_OUTCOME" "$GENERATE_OUTCOME" "$PROJECT_OUTCOME" "$LINT_OUTCOME" "$VERIFY_OUTCOME" "$REPORT_OUTCOME" "$UPLOAD_OUTCOME"; do
+            if [[ "$outcome" != "success" ]]; then
+              echo "::error::BPHealth verification is incomplete or failed. See CI_REPORT.md and this run's logs."
+              exit 1
+            fi
+          done
