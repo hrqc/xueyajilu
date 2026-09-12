@@ -248,6 +248,18 @@ private func parseTargetRange(_ text: String) -> (systolicMin: Int, systolicMax:
 
 private let bpDisclaimer = "本应用不能替代医生诊断，如有不适请及时就医。"
 
+private func bpClassificationColor(_ level: BPLevel) -> Color {
+    switch level.colorName {
+    case "blue": .blue
+    case "green": .green
+    case "yellow": .brown
+    case "orange": .orange
+    case "red": .red
+    case "purple": .purple
+    default: .gray
+    }
+}
+
 public extension BPUIReading {
     init(model: BloodPressureReading) {
         self.init(id: model.id, date: model.measuredAt, systolic: model.systolic, diastolic: model.diastolic, pulse: model.pulse, isFasting: model.fasting, note: model.note, classification: "", arm: model.arm, position: model.position, mood: model.mood, exerciseBefore: model.exerciseBefore, medicationTaken: model.medicationTaken)
@@ -383,15 +395,7 @@ private struct LatestReadingCard: View {
         }.padding().background(.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
     }
     private var classificationColor: Color {
-        switch classification.level.colorName {
-        case "blue": .blue
-        case "green": .green
-        case "yellow": .brown
-        case "orange": .orange
-        case "red": .red
-        case "purple": .purple
-        default: .gray
-        }
+        bpClassificationColor(classification.level)
     }
 }
 
@@ -459,7 +463,7 @@ private struct ReadingRow: View {
             Spacer()
             VStack(alignment: .trailing) {
                 Text("\(reading.systolic)/\(reading.diastolic)").font(.headline)
-                Text(classification.displayLevel(language: language)).font(.caption).foregroundStyle(.secondary)
+                Text(classification.displayLevel(language: language)).font(.caption).foregroundStyle(bpClassificationColor(classification.level))
             }
         }
         .accessibilityElement(children: .ignore)
@@ -564,7 +568,12 @@ private struct ReadingRow: View {
                 Section("基于最近一次记录") {
                     let model = BloodPressureReading(measuredAt: reading.date, systolic: reading.systolic, diastolic: reading.diastolic, pulse: reading.pulse, note: reading.note, arm: reading.arm, position: reading.position, mood: reading.mood, exerciseBefore: reading.exerciseBefore, medicationTaken: reading.medicationTaken, fasting: reading.isFasting)
                     let classification = store.dependencies.ruleEngine.classify(systolic: model.systolic, diastolic: model.diastolic, profile: store.coreProfile)
-                    Text("等级：\(classification.displayLevel(language: language))").font(.headline)
+                    HStack {
+                        Text("等级：\(classification.displayLevel(language: language))").font(.headline).foregroundStyle(bpClassificationColor(classification.level))
+                        Text(classification.isUrgent ? (language == .english ? "Urgent" : "紧急") : (language == .english ? "Not urgent" : "非紧急"))
+                            .font(.caption.bold())
+                            .foregroundStyle(classification.isUrgent ? .red : .secondary)
+                    }
                     Text(classification.displayExplanation(language: language))
                     Text(classification.displayAction(language: language)).font(.footnote).foregroundStyle(.secondary)
                     ForEach(store.dependencies.dietaryEngine.advice(for: model, profile: store.coreProfile)) { item in
@@ -620,7 +629,7 @@ private struct ReadingRow: View {
             Section("健康信息") {
                 TextField("身高（cm）", value: $store.profile.height, format: .number)
                 TextField("体重（kg）", value: $store.profile.weight, format: .number)
-                Text(language == .english ? "BMI: " + (store.profile.height > 0 ? String(format: "%.1f", store.profile.weight / pow(store.profile.height / 100, 2)) : "—") : "BMI：" + (store.profile.height > 0 ? String(format: "%.1f", store.profile.weight / pow(store.profile.height / 100, 2)) : "—"))
+                Text(language == .english ? "BMI: " + (store.profile.height > 0 && store.profile.weight > 0 ? String(format: "%.1f", store.profile.weight / pow(store.profile.height / 100, 2)) : "—") : "BMI：" + (store.profile.height > 0 && store.profile.weight > 0 ? String(format: "%.1f", store.profile.weight / pow(store.profile.height / 100, 2)) : "—"))
                 Toggle("肾病", isOn: conditionBinding("肾病")).accessibilityIdentifier("profile.kidneyDisease")
                 Toggle("糖尿病", isOn: conditionBinding("糖尿病")).accessibilityIdentifier("profile.diabetes")
                 Toggle("心脏病", isOn: conditionBinding("心脏病")).accessibilityIdentifier("profile.heartDisease")

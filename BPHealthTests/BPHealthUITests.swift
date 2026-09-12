@@ -99,8 +99,10 @@ final class BPHealthUITests: XCTestCase {
         XCTAssertTrue(app.datePickers.firstMatch.waitForExistence(timeout: 5))
         let fasting = app.switches["空腹测量"]
         XCTAssertTrue(reveal(fasting))
+        let before = fasting.value as? String
         fasting.tap()
-        XCTAssertTrue(fasting.exists)
+        let after = app.switches["空腹测量"].value as? String
+        XCTAssertNotEqual(before, after)
         app.buttons["取消"].tap()
     }
 

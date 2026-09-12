@@ -135,16 +135,21 @@ extension AuthenticationService: AuthenticationServicing {}
         guard isAvailable, let systolicType = HKQuantityType.quantityType(forIdentifier: .bloodPressureSystolic), let diastolicType = HKQuantityType.quantityType(forIdentifier: .bloodPressureDiastolic), let correlationType = HKObjectType.correlationType(forIdentifier: .bloodPressure) else { return }
         let systolicQuantity = HKQuantity(unit: HKUnit.millimeterOfMercury(), doubleValue: Double(systolic))
         let diastolicQuantity = HKQuantity(unit: HKUnit.millimeterOfMercury(), doubleValue: Double(diastolic))
-        var samples: Set<HKSample> = [
+        let bloodPressureSamples: Set<HKSample> = [
             HKQuantitySample(type: systolicType, quantity: systolicQuantity, start: measuredAt, end: measuredAt),
             HKQuantitySample(type: diastolicType, quantity: diastolicQuantity, start: measuredAt, end: measuredAt)
         ]
+        // A blood-pressure correlation accepts systolic/diastolic samples.
+        // Heart rate is a separate quantity in HealthKit; keeping it out of
+        // the correlation prevents the entire blood-pressure write from being
+        // rejected on devices that enforce the correlation schema strictly.
+        let correlation = HKCorrelation(type: correlationType, start: measuredAt, end: measuredAt, objects: bloodPressureSamples)
+        try await store.save(correlation)
         if let pulse, let pulseType = HKQuantityType.quantityType(forIdentifier: .heartRate) {
             let pulseQuantity = HKQuantity(unit: HKUnit.count().unitDivided(by: HKUnit.minute()), doubleValue: Double(pulse))
-            samples.insert(HKQuantitySample(type: pulseType, quantity: pulseQuantity, start: measuredAt, end: measuredAt))
+            let pulseSample = HKQuantitySample(type: pulseType, quantity: pulseQuantity, start: measuredAt, end: measuredAt)
+            try await store.save(pulseSample)
         }
-        let correlation = HKCorrelation(type: correlationType, start: measuredAt, end: measuredAt, objects: samples)
-        try await store.save(correlation)
         #endif
     }
     public func save(_ reading: BloodPressureReading) async throws {
