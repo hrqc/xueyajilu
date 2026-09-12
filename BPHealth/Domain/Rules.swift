@@ -13,7 +13,6 @@ public struct ReadingValidator {
     }
 }
 
-
 public struct PediatricPercentileThreshold: Sendable {
     public let age: Int
     public let sex: String
@@ -93,10 +92,15 @@ public struct BloodPressureRuleEngine {
         } else if systolic < 90 || diastolic < 60 {
             base = .init(level: .low, explanation: "收缩压低于 90 或舒张压低于 60 mmHg。", isUrgent: false, action: "补水并留意头晕、乏力或晕厥；有症状请及时就医。")
         } else if standard == .accAha {
-            if systolic >= 140 || diastolic >= 90 { base = .init(level: .stage2, explanation: "ACC/AHA：收缩压 ≥140 或舒张压 ≥90 mmHg。", isUrgent: false, action: "预约医生评估并持续监测。") }
-            else if systolic >= 130 || diastolic >= 80 { base = .init(level: .stage1, explanation: "ACC/AHA：收缩压 130–139 或舒张压 80–89 mmHg。", isUrgent: false, action: "改善生活方式并与医生讨论风险。") }
-            else if systolic >= 120 && diastolic < 80 { base = .init(level: .elevated, explanation: "ACC/AHA：收缩压 120–129 且舒张压低于 80 mmHg。", isUrgent: false, action: "减少盐分并继续监测。") }
-            else { base = .init(level: .normal, explanation: "ACC/AHA：收缩压低于 120 且舒张压低于 80 mmHg。", isUrgent: false, action: "保持均衡生活方式并定期监测。") }
+            if systolic >= 140 || diastolic >= 90 {
+                base = .init(level: .stage2, explanation: "ACC/AHA：收缩压 ≥140 或舒张压 ≥90 mmHg。", isUrgent: false, action: "预约医生评估并持续监测。")
+            } else if systolic >= 130 || diastolic >= 80 {
+                base = .init(level: .stage1, explanation: "ACC/AHA：收缩压 130–139 或舒张压 80–89 mmHg。", isUrgent: false, action: "改善生活方式并与医生讨论风险。")
+            } else if systolic >= 120 && diastolic < 80 {
+                base = .init(level: .elevated, explanation: "ACC/AHA：收缩压 120–129 且舒张压低于 80 mmHg。", isUrgent: false, action: "减少盐分并继续监测。")
+            } else {
+                base = .init(level: .normal, explanation: "ACC/AHA：收缩压低于 120 且舒张压低于 80 mmHg。", isUrgent: false, action: "保持均衡生活方式并定期监测。")
+            }
         } else if systolic >= 160 || diastolic >= 100 {
             base = .init(level: .stage2, explanation: "收缩压 160–179 或舒张压 100–109 mmHg。", isUrgent: false, action: "连续测量并预约医生评估。")
         } else if systolic >= 140 || diastolic >= 90 {

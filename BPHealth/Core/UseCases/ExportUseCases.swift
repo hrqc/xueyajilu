@@ -57,12 +57,21 @@ public struct PDFExporter: Sendable {
         func positionName(_ position: BodyPosition?) -> String {
             guard let position else { return "" }
             if !english { return position.rawValue }
-            switch position { case .sitting: return "Sitting"; case .standing: return "Standing"; case .lying: return "Lying" }
+            switch position {
+            case .sitting: return "Sitting"
+            case .standing: return "Standing"
+            case .lying: return "Lying"
+            }
         }
         func moodName(_ mood: Mood?) -> String {
             guard let mood else { return "" }
             if !english { return mood.rawValue }
-            switch mood { case .calm: return "Calm"; case .stressed: return "Stressed"; case .tired: return "Tired"; case .unwell: return "Unwell" }
+            switch mood {
+            case .calm: return "Calm"
+            case .stressed: return "Stressed"
+            case .tired: return "Tired"
+            case .unwell: return "Unwell"
+            }
         }
         let format = UIGraphicsPDFRendererFormat()
         let renderer = UIGraphicsPDFRenderer(bounds: CGRect(x: 0, y: 0, width: 595, height: 842), format: format)

@@ -110,7 +110,7 @@ extension AuthenticationService: AuthenticationServicing {}
         guard isAvailable, let correlationType = HKObjectType.correlationType(forIdentifier: .bloodPressure) else { return [] }
         return try await withCheckedThrowingContinuation { continuation in
             let predicate = HKQuery.predicateForSamples(withStart: since, end: .now, options: .strictStartDate)
-            let query = HKCorrelationQuery(type: correlationType, predicate: predicate, samplePredicate: nil) { _, correlations, error in
+            let query = HKCorrelationQuery(type: correlationType, predicate: predicate, samplePredicates: nil) { _, correlations, error in
                 if let error { continuation.resume(throwing: error); return }
                 let results = (correlations ?? []).compactMap { correlation -> ExportReading? in
                     let samples = correlation.objects.compactMap { $0 as? HKQuantitySample }

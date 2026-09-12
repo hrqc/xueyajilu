@@ -15,7 +15,12 @@ public extension BodyPosition {
 public extension Mood {
     func displayName(language: AppLanguage) -> String {
         guard language == .english else { return rawValue }
-        switch self { case .calm: return "Calm"; case .stressed: return "Stressed"; case .tired: return "Tired"; case .unwell: return "Unwell" }
+        switch self {
+        case .calm: return "Calm"
+        case .stressed: return "Stressed"
+        case .tired: return "Tired"
+        case .unwell: return "Unwell"
+        }
     }
 }
 
@@ -108,7 +113,17 @@ public struct ValidationResult: Sendable { public let issues: [ValidationIssue];
 
 public enum BPLevel: String, Codable, CaseIterable, Sendable, Hashable {
     case low = "低血压", normal = "正常", elevated = "正常高值", stage1 = "1级高血压", stage2 = "2级高血压", stage3 = "3级高血压", crisis = "高血压危象", pediatricEvaluation = "需儿科医生评估"
-    public var colorName: String { switch self { case .low: "blue"; case .normal: "green"; case .elevated: "yellow"; case .stage1: "orange"; case .stage2: "red"; case .stage3, .crisis: "purple"; case .pediatricEvaluation: "gray" } }
+    public var colorName: String {
+        switch self {
+        case .low: "blue"
+        case .normal: "green"
+        case .elevated: "yellow"
+        case .stage1: "orange"
+        case .stage2: "red"
+        case .stage3, .crisis: "purple"
+        case .pediatricEvaluation: "gray"
+        }
+    }
 }
 public struct BPClassification: Sendable, Equatable {
     public let level: BPLevel; public let explanation: String; public let isUrgent: Bool; public let action: String

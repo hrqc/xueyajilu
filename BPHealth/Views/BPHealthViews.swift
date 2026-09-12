@@ -220,7 +220,7 @@ public final class BPUIStore: ObservableObject {
 public struct BPUIProfile: Equatable {
     public var name = ""
     public var birthDate: Date?
-    public var ageOverride: Int? = nil
+    public var ageOverride: Int?
     public var gender = "未设置"
     public var height: Double = 0
     public var weight: Double = 0
@@ -378,7 +378,15 @@ private struct LatestReadingCard: View {
         }.padding().background(.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
     }
     private var classificationColor: Color {
-        switch classification.level.colorName { case "blue": .blue; case "green": .green; case "yellow": .brown; case "orange": .orange; case "red": .red; case "purple": .purple; default: .gray }
+        switch classification.level.colorName {
+        case "blue": .blue
+        case "green": .green
+        case "yellow": .brown
+        case "orange": .orange
+        case "red": .red
+        case "purple": .purple
+        default: .gray
+        }
     }
 }
 
@@ -415,10 +423,10 @@ private struct SectionHeader: View { let title: String; let action: String; @App
         }.navigationTitle(editing == nil ? "添加记录" : "编辑记录").toolbar { ToolbarItem(placement: .cancellationAction) { Button("取消") { dismiss() } }; ToolbarItem(placement: .confirmationAction) { Button("保存") { save() }.disabled(!valid) } }.alert("时间提示", isPresented: $showFutureWarning) { Button("知道了") { dismiss() } } message: { Text("测量时间晚于当前时间，记录已保存，请确认时间是否正确。") }
     }
     private func numericField(_ title: String, text: Binding<String>, range: String) -> some View { let language = AppLanguage(rawValue: languageRaw) ?? .simplifiedChinese; return HStack { TextField(BPText.localized(title, language: language), text: text).keyboardType(.numberPad); Spacer(); Text(range).font(.caption).foregroundStyle(.secondary) } }
-    private var values: (Int,Int,Int?)? { guard let s = Int(systolic), let d = Int(diastolic), (50...300).contains(s), (30...200).contains(d), s > d else { return nil }; let p: Int?; if pulse.isEmpty { p = nil } else { guard let parsed = Int(pulse), (30...250).contains(parsed) else { return nil }; p = parsed }; return (s,d,p) }
+    private var values: (Int, Int, Int?)? { guard let s = Int(systolic), let d = Int(diastolic), (50...300).contains(s), (30...200).contains(d), s > d else { return nil }; let p: Int?; if pulse.isEmpty { p = nil } else { guard let parsed = Int(pulse), (30...250).contains(parsed) else { return nil }; p = parsed }; return (s, d, p) }
     private var language: AppLanguage { AppLanguage(rawValue: languageRaw) ?? .simplifiedChinese }
     private var valid: Bool { values != nil }
-    private func save() { guard let (s,d,p) = values else { errorMessage = "请检查输入范围，并确保收缩压高于舒张压。"; return }; let isFuture = date > .now; if isFuture { errorMessage = "测量时间晚于当前时间，记录将保存并提示。" }; let item = BPUIReading(id: editing?.id ?? UUID(), date: date, systolic: s, diastolic: d, pulse: p, isFasting: isFasting, note: note, classification: store.classify(s, d), arm: arm, position: position, mood: mood, exerciseBefore: exerciseBefore, medicationTaken: medicationTaken); if editing == nil { store.add(item) } else { store.update(item) }; if !store.persistenceMessage.isEmpty { errorMessage = store.persistenceMessage; return }; if isFuture { showFutureWarning = true } else { dismiss() } }
+    private func save() { guard let (s, d, p) = values else { errorMessage = "请检查输入范围，并确保收缩压高于舒张压。"; return }; let isFuture = date > .now; if isFuture { errorMessage = "测量时间晚于当前时间，记录将保存并提示。" }; let item = BPUIReading(id: editing?.id ?? UUID(), date: date, systolic: s, diastolic: d, pulse: p, isFasting: isFasting, note: note, classification: store.classify(s, d), arm: arm, position: position, mood: mood, exerciseBefore: exerciseBefore, medicationTaken: medicationTaken); if editing == nil { store.add(item) } else { store.update(item) }; if !store.persistenceMessage.isEmpty { errorMessage = store.persistenceMessage; return }; if isFuture { showFutureWarning = true } else { dismiss() } }
 }
 
 @MainActor public struct HistoryView: View {
@@ -732,8 +740,13 @@ private struct ReadingRow: View {
                 Button { pdfData = PDFExporter().exportSummary(readings: exportReadings, title: languageRaw == AppLanguage.english.rawValue ? "BPHealth blood pressure record" : "BPHealth 血压记录", language: AppLanguage(rawValue: languageRaw) ?? .simplifiedChinese); if pdfData == nil { exportError = languageRaw == AppLanguage.english.rawValue ? "PDF generation is unavailable on this platform." : "当前平台暂不支持 PDF 生成。" } } label: { Label("生成 PDF", systemImage: "doc.richtext") }
                 if let pdfData { ShareLink(item: pdfData, preview: SharePreview("BPHealth 血压记录 PDF")) { Label("分享 PDF", systemImage: "square.and.arrow.up") } }
                 Button {
-                    do { encryptedBackup = try EncryptedBackupExporter().export(readings: exportReadings); exportError = "" }
-                    catch { encryptedBackup = nil; exportError = languageRaw == AppLanguage.english.rawValue ? "The encrypted backup could not be generated. Please try again later." : "加密备份生成失败，请稍后重试。" }
+                    do {
+                        encryptedBackup = try EncryptedBackupExporter().export(readings: exportReadings)
+                        exportError = ""
+                    } catch {
+                        encryptedBackup = nil
+                        exportError = languageRaw == AppLanguage.english.rawValue ? "The encrypted backup could not be generated. Please try again later." : "加密备份生成失败，请稍后重试。"
+                    }
                 } label: { Label("生成加密备份", systemImage: "lock.doc") }
                 if let encryptedBackup { ShareLink(item: encryptedBackup, preview: SharePreview("BPHealth 加密备份")) { Label("分享加密备份", systemImage: "lock.shield") } }
                 if !exportError.isEmpty { Text(exportError).font(.footnote).foregroundStyle(.red) }
