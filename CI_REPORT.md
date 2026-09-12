@@ -14,14 +14,14 @@
 - 覆盖率：overall=80.00%; core-rules=93.71%
 - 最终质量门禁：PASS
 
-- 本轮原始工件：`/Users/runner/work/xueyajilu/xueyajilu/artifacts/run-20260912T031740Z-30157`
+- 本轮原始工件：`/Users/runner/work/xueyajilu/xueyajilu/artifacts/run-20260912T033236Z-4160`
 
 日志、`.xcresult` 和截图均来自本次 macOS runner；缺失工件会导致门禁失败。
 
 ## 本次 GitHub Actions 执行状态
 
-- 运行：https://github.com/hrqc/xueyajilu/actions/runs/34669947177（attempt 1）
-- 提交：0aa46ab3089828c83b5b64ef60106bb4a8a3bb74
+- 运行：https://github.com/hrqc/xueyajilu/actions/runs/34670578007（attempt 1）
+- 提交：544d98f6debf742061690d2972ed8996504a42cf
 - Runner：macOS / ARM64
 - Checkout：success
 - Apple 工具链：success

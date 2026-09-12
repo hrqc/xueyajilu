@@ -13,7 +13,7 @@ BPHealth 是面向 iPhone（iOS 17+）的本地优先血压记录与健康管理
 - `docs/test-plan.md`：测试计划
 - `docs/medical-disclaimer.md`：医疗免责声明
 - `TEST_REPORT.md`：当前验证结果
-- `CI_REPORT.md`：macOS CI 最终结果入口（运行 34669947177 已通过）
+- `CI_REPORT.md`：macOS CI 最终结果入口（运行 34670578007 已通过）
 - `app.js` / `index.html` / `styles.css`：早期 Web 原型，仅用于交互参考，不属于 iOS 医疗数据交付；已移除外部字体请求。
 
 ## 在 macOS/Xcode 运行
@@ -30,7 +30,7 @@ BPHealth 是面向 iPhone（iOS 17+）的本地优先血压记录与健康管理
 
 ## Windows 现状
 
-开发工作区为 Windows；真实 iOS 验证已由 GitHub Actions macOS runner 完成（运行 34669947177：54/54 测试、覆盖率 80.00%、规则 93.71%、警告 0）。Face ID/Touch ID、HealthKit 和 VoiceOver 仍需真机复核。Web 原型使用浏览器 localStorage，不应存放真实敏感健康数据；正式健康数据请使用 iOS App。
+开发工作区为 Windows；真实 iOS 验证已由 GitHub Actions macOS runner 完成（运行 34670578007：54/54 测试、覆盖率 80.00%、规则 93.71%、警告 0）。Face ID/Touch ID、HealthKit 和 VoiceOver 仍需真机复核。Web 原型使用浏览器 localStorage，不应存放真实敏感健康数据；正式健康数据请使用 iOS App。
 
 ## 数据与医疗安全
 

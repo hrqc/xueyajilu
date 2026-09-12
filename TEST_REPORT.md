@@ -360,7 +360,7 @@ scripts/remote-verify.sh 与 project.yml 已统一为 LF，避免 macOS Bash 读
 
 ## 2026-09-12 macOS CI 最终门禁
 
-- 运行：[GitHub Actions 34669947177](https://github.com/hrqc/xueyajilu/actions/runs/34669947177)，提交 `0aa46ab3089828c83b5b64ef60106bb4a8a3bb74`。
+- 运行：[GitHub Actions 34670578007](https://github.com/hrqc/xueyajilu/actions/runs/34670578007)，提交 `544d98f6debf742061690d2972ed8996504a42cf`。
 - 修改文件：`BPHealth/Views/BPHealthViews.swift`、`BPHealthTests/BPHealthRuleTests.swift`、`BPHealthTests/BPHealthUITests.swift`、`BPHealthTests/BPHealthViewCoverageTests.swift`、`project.yml`、`scripts/ci_report.py`、`scripts/remote-verify.sh`。
 - 执行命令：macOS runner 上的 XcodeGen、`xcodebuild build`、`xcodebuild test -enableCodeCoverage YES`、`xcodebuild analyze`、SwiftLint strict、`xcrun simctl` 安装/启动/截图及 `xccov` 门禁。
 - 结果：Build 通过；XCTest/UI Test `54/54` 通过；analyze 通过；SwiftLint 通过；编译/分析警告 `0`；App 安装、启动、截图均通过；整体覆盖率 `80.00%`；核心规则覆盖率 `93.71%`；最终质量门禁 PASS。
