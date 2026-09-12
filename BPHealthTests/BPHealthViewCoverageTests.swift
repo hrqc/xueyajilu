@@ -76,4 +76,21 @@ final class BPHealthViewCoverageTests: XCTestCase {
         UserDefaults.standard.removeObject(forKey: "bphealth.language")
         XCTAssertTrue(store.readings.isEmpty)
     }
+
+    func testUIStoreLocalLifecycleWithoutPersistenceContext() {
+        let initial = BPUIReading(date: .now, systolic: 120, diastolic: 80)
+        let added = BPUIReading(date: .now.addingTimeInterval(60), systolic: 130, diastolic: 84)
+        let store = BPUIStore(readings: [initial])
+        store.profile.gender = "女"
+        store.profile.targetRange = "100-130/65-85 mmHg"
+        XCTAssertEqual(store.coreProfile.targetSystolicMin, 100)
+        XCTAssertEqual(store.coreProfile.targetDiastolicMax, 85)
+        store.replace(readings: [initial, added])
+        XCTAssertTrue(store.add(added, syncHealthKit: false))
+        store.update(initial)
+        store.remove(added)
+        store.clearAllLocalData()
+        XCTAssertTrue(store.readings.isEmpty)
+        XCTAssertFalse(store.reminderEnabled)
+    }
 }
