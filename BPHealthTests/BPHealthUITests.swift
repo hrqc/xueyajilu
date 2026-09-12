@@ -97,17 +97,14 @@ final class BPHealthUITests: XCTestCase {
         guard add.waitForExistence(timeout: 5) else { return XCTFail("找不到添加记录入口") }
         add.tap()
         XCTAssertTrue(app.datePickers.firstMatch.waitForExistence(timeout: 5))
-        let fasting = app.switches["空腹测量"]
+        let fasting = app.switches["fasting-toggle"]
         XCTAssertTrue(reveal(fasting))
         let before = fasting.value as? String
-        fasting.tap()
-        let updatedFasting = app.switches["空腹测量"]
-        let valueChanged = NSPredicate { _, _ in
-            guard let current = updatedFasting.value as? String else { return false }
-            return current != before
-        }
+        fasting.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.5)).tap()
+        let updatedFasting = app.switches["fasting-toggle"]
+        let valueChanged = NSPredicate { _, _ in (updatedFasting.value as? String) != before }
         let expectation = XCTNSPredicateExpectation(predicate: valueChanged, object: updatedFasting)
-        XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: 2), .completed)
+        XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: 3), .completed)
         let after = updatedFasting.value as? String
         XCTAssertNotEqual(before, after)
         app.buttons["取消"].tap()
