@@ -7,6 +7,15 @@ settings:
     SWIFT_VERSION: "5.9"
     SWIFT_TREAT_WARNINGS_AS_ERRORS: "YES"
     GCC_TREAT_WARNINGS_AS_ERRORS: "YES"
+    # The INFOPLIST_KEY_* settings below only feed a *generated* Info.plist.
+    # Without this switch no Info.plist is produced at all, and the Validate
+    # phase fails with "Build input file cannot be found: .../BPHealth.app/Info.plist".
+    GENERATE_INFOPLIST_FILE: "YES"
+    # These two populate CFBundleShortVersionString / CFBundleVersion in the
+    # generated plist; leaving them unset yields empty strings and the
+    # simulator install step fails.
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
 configFiles:
   Debug: Config/Shared.xcconfig
   Release: Config/Shared.xcconfig
