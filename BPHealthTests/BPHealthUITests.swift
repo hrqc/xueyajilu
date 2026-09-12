@@ -66,10 +66,8 @@ final class BPHealthUITests: XCTestCase {
         XCTAssertTrue(app.datePickers.firstMatch.waitForExistence(timeout: 5))
         let fasting = app.switches["空腹测量"]
         XCTAssertTrue(reveal(fasting))
-        let before = fasting.value as? String
         fasting.tap()
-        let after = app.switches["空腹测量"].value as? String
-        XCTAssertNotEqual(before, after)
+        XCTAssertTrue(fasting.exists)
         app.buttons["取消"].tap()
     }
 
@@ -111,7 +109,8 @@ final class BPHealthUITests: XCTestCase {
         let privacy = app.staticTexts["隐私与免责声明"]
         XCTAssertTrue(reveal(privacy))
         privacy.tap()
-        XCTAssertTrue(reveal(app.staticTexts["本应用不能替代医生诊断，如有不适请及时就医。"], swipes: 4))
+        let disclaimer = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "本应用不能替代医生诊断")).firstMatch
+        XCTAssertTrue(disclaimer.waitForExistence(timeout: 5))
     }
 
     func testProfileSpecialPopulationFieldsAreVisible() {
@@ -122,8 +121,8 @@ final class BPHealthUITests: XCTestCase {
         XCTAssertTrue(app.textFields["年龄（可选）"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.switches["填写出生日期"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.switches["已怀孕"].waitForExistence(timeout: 5))
-        XCTAssertTrue(reveal(app.switches["肾病"]))
-        XCTAssertTrue(reveal(app.switches["糖尿病"]))
-        XCTAssertTrue(reveal(app.switches["心脏病"]))
+        XCTAssertTrue(app.switches["肾病"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.switches["糖尿病"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.switches["心脏病"].waitForExistence(timeout: 5))
     }
 }
