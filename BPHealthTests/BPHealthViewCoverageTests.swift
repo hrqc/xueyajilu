@@ -67,6 +67,13 @@ final class BPHealthViewCoverageTests: XCTestCase {
         _ = AdviceView(store: store).body
         _ = ProfileView(store: store).body
         _ = SettingsView(store: store).body
+        UserDefaults.standard.set(AppLanguage.english.rawValue, forKey: "bphealth.language")
+        store.profile.birthDate = nil
+        store.persistenceMessage = ""
+        _ = ProfileView(store: store).body
+        _ = SettingsView(store: store).body
+        _ = ExportView(store: store).body
+        UserDefaults.standard.removeObject(forKey: "bphealth.language")
         XCTAssertTrue(store.readings.isEmpty)
     }
 }
