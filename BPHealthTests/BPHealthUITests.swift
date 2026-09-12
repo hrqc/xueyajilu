@@ -12,6 +12,14 @@ final class BPHealthUITests: XCTestCase {
         return element.exists && element.isHittable
     }
 
+    private func existsAfterSwiping(_ element: XCUIElement, swipes: Int = 8) -> Bool {
+        for _ in 0...swipes {
+            if element.waitForExistence(timeout: 1) { return true }
+            app.swipeUp()
+        }
+        return element.exists
+    }
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         app.launchArguments = ["-ui-testing"]
@@ -121,8 +129,8 @@ final class BPHealthUITests: XCTestCase {
         XCTAssertTrue(app.textFields["年龄（可选）"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.switches["填写出生日期"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.switches["已怀孕"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.switches["肾病"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.switches["糖尿病"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.switches["心脏病"].waitForExistence(timeout: 5))
+        XCTAssertTrue(existsAfterSwiping(app.switches["profile.kidneyDisease"]))
+        XCTAssertTrue(existsAfterSwiping(app.switches["profile.diabetes"]))
+        XCTAssertTrue(existsAfterSwiping(app.switches["profile.heartDisease"]))
     }
 }
