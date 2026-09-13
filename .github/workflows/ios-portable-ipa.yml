@@ -2,9 +2,6 @@ name: Build BPHealth Portable IPA
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - portable-validation
 
 permissions:
   contents: read
