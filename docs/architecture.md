@@ -17,6 +17,10 @@ UI 通过 `BPUIStore` 注入 SwiftData `ModelContext`、`ReadingUseCase` 和平�
 
 设置页的“删除全部本地数据”通过 Repository/UseCase 原子清除血压记录和用户资料；失败时回滚 SwiftData 上下文并恢复界面状态。 同时重置本地提醒、指南、HealthKit 开关、语言和锁定设置，并取消本地通知；HealthKit 中的外部样本不会被删除。
 
+## 个人侧载变体
+
+XcodeGen 同时生成 `BPHealth` 与 `BPHealthPortable` 两个 App target。正式 target 显式设置 `BPHEALTH_HEALTHKIT_ENABLED`，链接 HealthKit 并使用 HealthKit entitlement；便携 target 使用 `com.hrqc.bphealth.personal`、空 entitlements 和默认关闭的 HealthKit 编译分支。便携版由 `HealthKitService` stub 安全返回不可用状态，设置页隐藏 HealthKit 控件，避免免费 Apple ID 重签时出现不匹配的 capability。便携 workflow 只生成 unsigned `iphoneos` IPA，Windows 端再由用户使用 Sideloadly 和自己的 Apple ID 重签。
+
 
 `PediatricPercentileEvaluator` 接受可配置的年龄、性别、身高区间和第 90/95 百分位阈值，并内置中国 3–17 岁筛查参考表的本地版本（参考《中国 3～17 岁儿童青少年血压参照标准》及[中国高血压健康管理规范](https://csc.cma.org.cn/art/2020/5/8/art_619_34440.html)）。指南要求儿童采用年龄、性别和身高百分位表格标准，简化公式只能用于初筛；因此没有匹配表、年龄小于 3 岁或资料不完整时，只返回儿科医生评估提示，避免把成人阈值误用于儿童。当前内置表仍属于健康管理筛查参考，不能替代儿科诊断，正式发布前应由医疗审核替换或确认完整百分位数据。
 

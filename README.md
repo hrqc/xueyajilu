@@ -28,6 +28,18 @@ BPHealth 是面向 iPhone（iOS 17+）的本地优先血压记录与健康管理
 
 在当前 Windows 环境可运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/windows-static-check.ps1`，检查交付物、Swift 禁用 API、花括号、免责声明、换行、Node、Bash 语法和 12 个便携边界语义烟测；这不能替代 macOS 的 Xcode 编译和 XCTest。
 
+## Windows + iPhone 个人侧载
+
+仓库提供 `BPHealthPortable` 个人侧载 target，Bundle Identifier 为 `com.hrqc.bphealth.personal`。该版本关闭 HealthKit entitlement、HealthKit framework 和设置页 HealthKit 控件，保留本地记录、趋势、统计、CSV/PDF、提醒、Face ID/Touch ID 与加密备份。
+
+1. 打开 GitHub Actions 的 `Build BPHealth Portable IPA` 工作流并点击 **Run workflow**。
+2. 等待 macOS runner 完成，下载 artifact `bphealth-portable-ipa` 中的 `BPHealthPortable-unsigned.ipa`。
+3. 在 Windows 安装 [Sideloadly](https://sideloadly.io/) 及其要求的官方 Windows 版 iTunes/iCloud，将 iPhone 连接到电脑并信任设备。
+4. 将 unsigned IPA 拖入 Sideloadly，在 Sideloadly 本机输入你自己的 Apple ID，点击 Start 完成重签和安装。
+5. 首次启动若提示信任开发者，到 iPhone“设置 → 通用 → VPN 与设备管理”完成信任。
+
+GitHub artifact 是**未签名的 iphoneos IPA**，不能直接安装；Apple ID、密码和验证码不要提交到 GitHub 或发送给 Codex。免费 Apple ID 侧载有效期较短，需要定期重新签名。个人侧载版不包含 HealthKit；如需 HealthKit、TestFlight 或 App Store 发布，需要付费 Apple Developer Team 和正式 `BPHealth` target。
+
 ## Windows 现状
 
 开发工作区为 Windows；真实 iOS 验证已由 GitHub Actions macOS runner 完成（运行 34673382905：54/54 测试、覆盖率 80.08%、规则 93.71%、警告 0）。Face ID/Touch ID、HealthKit 和 VoiceOver 仍需真机复核。Web 原型使用浏览器 localStorage，不应存放真实敏感健康数据；正式健康数据请使用 iOS App。

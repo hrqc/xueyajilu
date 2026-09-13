@@ -1,0 +1,131 @@
+name: Build BPHealth Portable IPA
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-portable-ipa:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Apple toolchain
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          xcode-select -p
+
+      - name: Install XcodeGen and SwiftLint
+        run: |
+          set -euo pipefail
+          if ! brew list --formula xcodegen >/dev/null 2>&1; then
+            brew install xcodegen
+          fi
+          if ! brew list --formula swiftlint >/dev/null 2>&1; then
+            brew install swiftlint
+          fi
+          xcodegen --version
+          swiftlint version
+
+      - name: Generate Xcode project
+        run: |
+          set -euo pipefail
+          xcodegen generate
+          xcodebuild -list -project BPHealth.xcodeproj
+
+      - name: SwiftLint quality check
+        run: |
+          set -euo pipefail
+          mkdir -p portable-artifacts
+          swiftlint lint --strict --config .swiftlint.yml --reporter json > portable-artifacts/swiftlint.json
+
+      - name: Build unsigned portable iPhone app
+        env:
+          PORTABLE_BUNDLE_ID: com.hrqc.bphealth.personal
+        run: |
+          set -euo pipefail
+          mkdir -p portable-artifacts
+          rm -rf portable-build
+          xcodebuild build \
+            -project BPHealth.xcodeproj \
+            -scheme BPHealthPortable \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath portable-build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=YES \
+            GCC_TREAT_WARNINGS_AS_ERRORS=YES \
+            PRODUCT_BUNDLE_IDENTIFIER="${PORTABLE_BUNDLE_ID}" \
+            2>&1 | tee portable-artifacts/xcodebuild.log
+
+      - name: Package and validate unsigned IPA
+        env:
+          PORTABLE_BUNDLE_ID: com.hrqc.bphealth.personal
+        run: |
+          set -euo pipefail
+          APP_PATH="$(find portable-build/Build/Products -type d -path '*/Release-iphoneos/*.app' -print -quit)"
+          if [[ -z "${APP_PATH}" || ! -f "${APP_PATH}/Info.plist" ]]; then
+            echo "::error::BPHealthPortable.app was not produced"
+            exit 1
+          fi
+
+          ACTUAL_BUNDLE_ID="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "${APP_PATH}/Info.plist")"
+          if [[ "${ACTUAL_BUNDLE_ID}" != "${PORTABLE_BUNDLE_ID}" ]]; then
+            echo "::error::Unexpected bundle identifier: ${ACTUAL_BUNDLE_ID}"
+            exit 1
+          fi
+
+          EXECUTABLE_NAME="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "${APP_PATH}/Info.plist")"
+          EXECUTABLE="${APP_PATH}/${EXECUTABLE_NAME}"
+          if [[ ! -f "${EXECUTABLE}" ]]; then
+            echo "::error::Application executable is missing"
+            exit 1
+          fi
+          if otool -L "${EXECUTABLE}" | grep -Fq 'HealthKit.framework'; then
+            echo "::error::Portable binary links HealthKit.framework"
+            exit 1
+          fi
+
+          rm -rf portable-package BPHealthPortable-unsigned.ipa
+          mkdir -p portable-package/Payload
+          cp -R "${APP_PATH}" portable-package/Payload/BPHealth.app
+          (
+            cd portable-package
+            /usr/bin/zip -qry ../BPHealthPortable-unsigned.ipa Payload
+          )
+
+          unzip -t BPHealthPortable-unsigned.ipa
+          if ! unzip -l BPHealthPortable-unsigned.ipa | grep -Fq 'Payload/BPHealth.app/Info.plist'; then
+            echo "::error::IPA is missing Payload/BPHealth.app/Info.plist"
+            exit 1
+          fi
+          if unzip -l BPHealthPortable-unsigned.ipa | grep -Fq 'embedded.mobileprovision'; then
+            echo "::error::Unsigned IPA unexpectedly contains embedded.mobileprovision"
+            exit 1
+          fi
+
+          {
+            echo "# BPHealth Portable IPA"
+            echo
+            echo "- Bundle ID: ${ACTUAL_BUNDLE_ID}"
+            echo "- Configuration: Release / iphoneos"
+            echo "- Signing: disabled (Sideloadly will sign locally)"
+            echo "- HealthKit linkage: absent"
+            echo "- Artifact: BPHealthPortable-unsigned.ipa"
+          } | tee portable-artifacts/portable-ipa-report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload portable IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bphealth-portable-ipa
+          path: |
+            BPHealthPortable-unsigned.ipa
+            portable-artifacts/
+          if-no-files-found: error
+          retention-days: 14

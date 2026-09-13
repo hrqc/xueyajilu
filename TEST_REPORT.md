@@ -372,3 +372,10 @@ scripts/remote-verify.sh 与 project.yml 已统一为 LF，避免 macOS Bash 读
 - 结果：Build、XCTest/UI Test、xcodebuild analyze、SwiftLint、安装/启动/截图全部通过；54/54 测试通过，整体覆盖率 80.08%，核心规则覆盖率 93.71%，编译/分析警告 0。
 - 本轮修复并验证：空腹开关的可访问性标识与真实控件坐标交互断言；之前两次开关断言失败已由本轮 54/54 通过结果覆盖。
 - GitHub Actions 仍报告 Node.js 20 action deprecation 注记；这是 runner action 兼容性提示，不是 Swift 编译/分析警告。
+
+## 个人侧载版本计划与限制
+
+- 新增 `BPHealthPortable` target，Bundle Identifier 为 `com.hrqc.bphealth.personal`，HealthKit 编译分支、framework、entitlement 和设置控件均关闭。
+- 新增 macOS `iphoneos` unsigned IPA 工作流；该工作流不保存 Apple ID、密码、验证码、证书或私钥。
+- Windows 安装需要下载 unsigned IPA 后使用 Sideloadly 和用户自己的 Apple ID 本地重签；免费账号的有效期、安装数量和可用 capability 受 Apple 当前政策限制。
+- 便携版的 HealthKit、TestFlight、App Store 能力不可用；本地记录、趋势、导出、提醒、生物识别和加密备份仍保留。

@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path (Join-Path $PSScriptRoot ".."))
 Set-Location $repo
@@ -14,9 +14,9 @@ function Require-File([string]$relativePath) {
 $required = @(
     "IMPLEMENTATION_PLAN.md", "README.md", "TEST_REPORT.md", "CI_REPORT.md",
     "Package.swift", "project.yml", "Config/Shared.xcconfig", ".gitattributes", ".swiftlint.yml",
-    ".github/workflows/ios-ci.yml", "scripts/remote-verify.sh", "scripts/ci_report.py",
+    ".github/workflows/ios-ci.yml", ".github/workflows/ios-portable-ipa.yml", "scripts/remote-verify.sh", "scripts/ci_report.py",
     "scripts/portable-boundary-check.py",
-    "BPHealth/BPHealth.entitlements", "BPHealth/PrivacyInfo.xcprivacy", "BPHealthTests/BPHealthRuleTests.swift",
+    "BPHealth/BPHealth.entitlements", "BPHealth/BPHealthPortable.entitlements", "BPHealth/PrivacyInfo.xcprivacy", "BPHealthTests/BPHealthRuleTests.swift",
     "BPHealthTests/BPHealthUITests.swift", "docs/architecture.md",
     "docs/test-plan.md", "docs/medical-disclaimer.md",
     "BPHealth/Core/UseCases/ReadingUseCases.swift",
@@ -72,8 +72,20 @@ if ($modelText -notmatch "displayLevel\(language") {
     $failures.Add("分类结果缺少显式语言显示映射")
 }
 $projectText = Get-Content -Raw -Encoding utf8 -LiteralPath "project.yml"
-if ($projectText -notmatch "BPHEALTH_BUNDLE_ID" -or $projectText -notmatch "BPHealth/Resources" -or $projectText -notmatch "PrivacyInfo\.xcprivacy") {
+if ($projectText -notmatch "BPHEALTH_BUNDLE_ID" -or $projectText -notmatch "BPHEALTH_PORTABLE_BUNDLE_ID" -or $projectText -notmatch "BPHealthPortable" -or $projectText -notmatch "BPHealth/Resources" -or $projectText -notmatch "PrivacyInfo\.xcprivacy") {
     $failures.Add("XcodeGen 配置缺少可覆盖 Bundle ID 或显式资源")
+}
+$configText = Get-Content -Raw -Encoding utf8 -LiteralPath "Config/Shared.xcconfig"
+if ($configText -notmatch "BPHEALTH_PORTABLE_BUNDLE_ID\s*=\s*com\.hrqc\.bphealth\.personal") {
+    $failures.Add("个人侧载 Bundle ID 配置缺失或不匹配")
+}
+$portableEntitlementsText = Get-Content -Raw -Encoding utf8 -LiteralPath "BPHealth/BPHealthPortable.entitlements"
+if ($portableEntitlementsText -match "com\.apple\.developer\.healthkit") {
+    $failures.Add("个人侧载 entitlements 不得声明 HealthKit")
+}
+$platformServicesText = Get-Content -Raw -Encoding utf8 -LiteralPath "BPHealth/Services/PlatformServices.swift"
+if ($platformServicesText -notmatch "BPHEALTH_HEALTHKIT_ENABLED\s*&&\s*canImport\(HealthKit\)") {
+    $failures.Add("HealthKit 缺少 fail-safe 编译条件")
 }
 
 $entitlements = [xml](Get-Content -Raw -Encoding utf8 -LiteralPath "BPHealth/BPHealth.entitlements")

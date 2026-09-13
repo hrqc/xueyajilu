@@ -6,7 +6,7 @@ import UserNotifications
 #if canImport(LocalAuthentication)
 import LocalAuthentication
 #endif
-#if canImport(HealthKit)
+#if BPHEALTH_HEALTHKIT_ENABLED && canImport(HealthKit)
 import HealthKit
 #endif
 
@@ -79,23 +79,23 @@ extension NotificationService: NotificationServicing {}
 extension AuthenticationService: AuthenticationServicing {}
 
 @MainActor public struct HealthKitService: @unchecked Sendable {
-    #if canImport(HealthKit)
+    #if BPHEALTH_HEALTHKIT_ENABLED && canImport(HealthKit)
     private let store: HKHealthStore
     #endif
     public init() {
-        #if canImport(HealthKit)
+        #if BPHEALTH_HEALTHKIT_ENABLED && canImport(HealthKit)
         store = HKHealthStore()
         #endif
     }
     public var isAvailable: Bool {
-        #if canImport(HealthKit)
+        #if BPHEALTH_HEALTHKIT_ENABLED && canImport(HealthKit)
         return HKHealthStore.isHealthDataAvailable()
         #else
         return false
         #endif
     }
     public func requestAuthorization() async throws -> Bool {
-        #if canImport(HealthKit)
+        #if BPHEALTH_HEALTHKIT_ENABLED && canImport(HealthKit)
         guard isAvailable, let systolic = HKObjectType.quantityType(forIdentifier: .bloodPressureSystolic), let diastolic = HKObjectType.quantityType(forIdentifier: .bloodPressureDiastolic), let pulse = HKObjectType.quantityType(forIdentifier: .heartRate) else { return false }
         let shareTypes: Set<HKSampleType> = [systolic, diastolic, pulse]
         let readTypes: Set<HKObjectType> = [systolic, diastolic, pulse]
@@ -106,7 +106,7 @@ extension AuthenticationService: AuthenticationServicing {}
         #endif
     }
     public func readRecentReadings(since: Date = .distantPast) async throws -> [ExportReading] {
-        #if canImport(HealthKit)
+        #if BPHEALTH_HEALTHKIT_ENABLED && canImport(HealthKit)
         guard isAvailable, let correlationType = HKObjectType.correlationType(forIdentifier: .bloodPressure) else { return [] }
         return try await withCheckedThrowingContinuation { continuation in
             let predicate = HKQuery.predicateForSamples(withStart: since, end: .now, options: .strictStartDate)
@@ -131,7 +131,7 @@ extension AuthenticationService: AuthenticationServicing {}
         try await save(systolic: reading.systolic, diastolic: reading.diastolic, pulse: reading.pulse, measuredAt: reading.date)
     }
     public func save(systolic: Int, diastolic: Int, pulse: Int? = nil, measuredAt: Date) async throws {
-        #if canImport(HealthKit)
+        #if BPHEALTH_HEALTHKIT_ENABLED && canImport(HealthKit)
         guard isAvailable, let systolicType = HKQuantityType.quantityType(forIdentifier: .bloodPressureSystolic), let diastolicType = HKQuantityType.quantityType(forIdentifier: .bloodPressureDiastolic), let correlationType = HKObjectType.correlationType(forIdentifier: .bloodPressure) else { return }
         let systolicQuantity = HKQuantity(unit: HKUnit.millimeterOfMercury(), doubleValue: Double(systolic))
         let diastolicQuantity = HKQuantity(unit: HKUnit.millimeterOfMercury(), doubleValue: Double(diastolic))

@@ -73,3 +73,9 @@ README.md / TEST_REPORT.md / CI_REPORT.md
 
 - 工程生成：提供 project.yml，macOS 可用 XcodeGen 生成 App/Unit/UI Test targets。
 - 自动验证：GitHub Actions 使用 macOS-15 runner 执行 XcodeGen、build/test/analyze、覆盖率和 Simulator 截图；Windows 不伪造这些结果。
+
+## 9. 无 Mac 个人侧载增量
+
+- XcodeGen 生成 `BPHealthPortable` target，使用 `com.hrqc.bphealth.personal`，以 `iphoneos` SDK 构建 unsigned IPA。
+- 正式 target 显式启用 `BPHEALTH_HEALTHKIT_ENABLED`；便携 target 默认关闭 HealthKit framework、entitlement、服务实现和设置控件，保留本地健康管理能力。
+- `.github/workflows/ios-portable-ipa.yml` 由 macOS-15 手动生成并上传 unsigned IPA；Windows 使用 Sideloadly 和用户自己的 Apple ID 重签，Apple 凭据不进入仓库或 CI。

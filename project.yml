@@ -28,6 +28,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(BPHEALTH_BUNDLE_ID)
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) BPHEALTH_HEALTHKIT_ENABLED"
         INFOPLIST_KEY_CFBundleDisplayName: BPHealth
         SWIFT_VERSION: "5.9"
         SWIFT_TREAT_WARNINGS_AS_ERRORS: "YES"
@@ -56,6 +57,31 @@ targets:
       gatherCoverageData: true
       coverageTargets:
         - BPHealth
+  BPHealthPortable:
+    type: application
+    platform: iOS
+    sources:
+      - path: BPHealth
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BPHEALTH_PORTABLE_BUNDLE_ID)
+        INFOPLIST_KEY_CFBundleDisplayName: BPHealth
+        SWIFT_VERSION: "5.9"
+        SWIFT_TREAT_WARNINGS_AS_ERRORS: "YES"
+        GCC_TREAT_WARNINGS_AS_ERRORS: "YES"
+        INFOPLIST_KEY_NSFaceIDUsageDescription: "用于保护本地健康记录"
+        INFOPLIST_KEY_NSHumanReadableCopyright: "BPHealth"
+        INFOPLIST_KEY_UIRequiresFullScreen: "YES"
+        CODE_SIGN_STYLE: Automatic
+    entitlements:
+      path: BPHealth/BPHealthPortable.entitlements
+    resources:
+      - path: BPHealth/Resources
+      - path: BPHealth/PrivacyInfo.xcprivacy
+    dependencies:
+      - sdk: AppIntents.framework
+    scheme:
+      gatherCoverageData: false
   BPHealthTests:
     type: bundle.unit-test
     platform: iOS

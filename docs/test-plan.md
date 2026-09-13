@@ -31,3 +31,7 @@ SwiftUI 界面使用注入 SwiftData `ModelContext` 的 `BPUIStore`，启动时�
 ## macOS 自动门禁
 
 `.github/workflows/ios-ci.yml` 在 `macos-15` 运行 XcodeGen、`xcodebuild build/test/analyze`、代码覆盖率和 iPhone Simulator 截图；`scripts/remote-verify.sh` 将真实状态写入 `CI_REPORT.md` 并上传日志与 `.xcresult`。
+
+## 个人侧载构建门禁
+
+`.github/workflows/ios-portable-ipa.yml` 在 macOS-15 上以 `iphoneos` SDK 编译 `BPHealthPortable`，使用 warnings-as-errors 和无签名模式生成 unsigned IPA。门禁检查 Payload 结构、Bundle Identifier、构建成功状态以及便携版不链接 HealthKit framework、不包含 `embedded.mobileprovision`；该工件需要在 Windows Sideloadly 中由用户本地重签，不能作为已签名发布包使用。

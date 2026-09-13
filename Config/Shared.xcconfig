@@ -1,2 +1,3 @@
 // Replace BPHEALTH_BUNDLE_ID in a local or CI-specific xcconfig to rebrand the app.
 BPHEALTH_BUNDLE_ID = com.example.bphealth
+BPHEALTH_PORTABLE_BUNDLE_ID = com.hrqc.bphealth.personal

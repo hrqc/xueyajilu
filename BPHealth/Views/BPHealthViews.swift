@@ -685,6 +685,7 @@ private struct ReadingRow: View {
             }
             Section("设备能力") {
                 Toggle("使用 Face ID / Touch ID 锁定", isOn: $lockEnabled)
+                #if BPHEALTH_HEALTHKIT_ENABLED
                 Toggle("写入 HealthKit", isOn: $store.healthKitSyncEnabled)
                     .onChange(of: store.healthKitSyncEnabled) { _, enabled in
                         UserDefaults.standard.set(enabled, forKey: "bphealth.healthKitSyncEnabled")
@@ -696,6 +697,11 @@ private struct ReadingRow: View {
                 Button("导入最近 HealthKit 数据") { Task { @MainActor in await importHealthKit() } }
                 Button("写入最近本地记录到 HealthKit") { let values = store.readings.prefix(20).map { ExportReading(date: $0.date, systolic: $0.systolic, diastolic: $0.diastolic, pulse: $0.pulse, fasting: $0.isFasting, note: $0.note) }; Task { @MainActor in do { for value in values { try await store.dependencies.healthKitService.save(value) }; healthKitMessage = status("已尝试写入最近本地记录", "Attempted to write recent local readings") } catch { healthKitMessage = status("HealthKit 写入失败，已保留本地数据", "HealthKit write failed; local data was preserved") } } }
                 if !healthKitMessage.isEmpty { Text(healthKitMessage).font(.footnote).foregroundStyle(.secondary) }
+                #else
+                Text("个人侧载版不包含 HealthKit；本地记录功能不受影响。")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                #endif
             }
             Section("安全") { NavigationLink("隐私与免责声明") { PrivacyDisclaimerView() } }
             Section("数据管理") {
@@ -782,7 +788,11 @@ private struct ReadingRow: View {
                 Text("数据存储").font(.headline)
                 Text("本应用默认将血压、个人资料和设置保存在设备本地，不会自动上传。应用删除或清除本地数据后，未导出的本地记录可能无法恢复。")
                 Text("第三方权限").font(.headline)
+                #if BPHEALTH_HEALTHKIT_ENABLED
                 Text("HealthKit 仅在你授权后读取或写入；Face ID / Touch ID 仅用于本地解锁；通知权限仅用于测量提醒。当前版本不自动启用 iCloud 同步，你可以随时在系统设置中撤销权限。")
+                #else
+                Text("个人侧载版不包含 HealthKit；Face ID / Touch ID 仅用于本地解锁；通知权限仅用于测量提醒。当前版本不自动启用 iCloud 同步。")
+                #endif
                 Text("本应用不能替代医生诊断，如有不适请及时就医。血压分类和建议仅供健康管理参考，不能用于自行调整处方药物。")
             }
             .padding()
